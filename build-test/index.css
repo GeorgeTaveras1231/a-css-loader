@@ -1,0 +1,7 @@
+:local(.test) {
+  color: red;
+}
+
+:global(.test-2) {
+  color: blue
+}
