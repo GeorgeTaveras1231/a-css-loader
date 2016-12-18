@@ -10,7 +10,7 @@ module.exports = {
       {
         test: /\.css$/,
         loaders: [
-          'icss-loader'
+          'icss-loader?generateScopedName=ff_[local]_[hash:3]'
         ]
       }
     ],

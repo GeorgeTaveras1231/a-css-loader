@@ -1,38 +1,110 @@
 const postcss = require('postcss');
-const postcssModules = require('postcss-modules')
+const postcssScope = require('postcss-modules-scope');
+const postcssExtractImports = require('postcss-modules-extract-imports');
+const loaderUtils = require('loader-utils');
 
-function getJSON () {
-  let resolve, reject;
-  const promise = new Promise((rs, rj) => {
-    [resolve, reject] = [rs, rj];
+let importIndex = 0;
+class ImportRule {
+  static createImportedName (importedName, path) {
+    return JSON.stringify({
+      type: 'imported-item',
+      index: importIndex++,
+      name: importedName,
+      path: path
+    });
+  }
+
+  constructor(rule) {
+    const match = /:import\((.+)\)/.exec(rule.selector)
+
+    this.rule = rule;
+    this.url = match[1];
+  }
+
+  imports() {
+    const imports = {};
+    this.rule.walkDecls(function (decl) {
+      imports[decl.prop] = decl.value;
+    });
+
+    return imports;
+  }
+}
+
+class ExportRule {
+  constructor(rule) {
+    this.rule = rule;
+  }
+
+  exports () {
+    const exports = {};
+    this.rule.walkDecls(function (decl) {
+      exports[decl.prop] = decl.value;
+    });
+
+    return exports;
+  }
+}
+
+const plugin = postcss.plugin('parser', function parserPlugin({ callback }) {
+  return function (css) {
+    const imports = [];
+    const exports = [];
+    css.walkRules(function (rule) {
+      if (/:import\(.+\)/.test(rule.selector)) {
+        imports.push(new ImportRule(rule));
+        rule.remove()
+      }
+
+
+      if (rule.selector === ':export') {
+        exports.push(new ExportRule(rule))
+        rule.remove()
+      }
+    });
+
+    callback(imports, exports);
+  }
+});
+
+function detachedPromise() {
+  let resolve;
+  const promise = new Promise((rs /*, rj */) => {
+    resolve = rs;
   });
 
-  return [promise, function (fileName, json) {
-    resolve(json);
-  }]
+  return [ resolve, promise ];
 }
 
 module.exports = function (source) {
+  this.cacheable();
   const callback = this.async();
-  const [getJSONPromise, getJSONCallback] = getJSON();
+  const query = loaderUtils.parseQuery(this.query);
+
+  const [resolveSymbols, symbolsPromise] = detachedPromise();
 
   const processPromise = postcss([
-    postcssModules({
-      scopedBehavior: 'global',
-      getJSON: getJSONCallback
-    })
-  ]).process(source, {})
+    postcssExtractImports({
+      createImportedName: ImportRule.createImportedName
+    }),
+    postcssScope({ }),
+    plugin({ callback: (...symbols) => resolveSymbols(symbols) })
+  ]).process(source, {});
 
-  this.cacheable();
 
-  Promise.all([processPromise, getJSONPromise])
-  .then(([css, json]) => {
+  Promise.all([processPromise, symbolsPromise])
+  .then(([css, [imports, exports]]) => {
     callback(null, `
-      module.export = {
+      //imports
+      const imports = ${JSON.stringify(imports)};
+
+      // exports
+      const exports = ${JSON.stringify(exports)};
+
+      module.exports = {
         toString: function toString() {
-          return ${JSON.stringify(css.css)};
-        },
-        locals: ${JSON.stringify(json)}
+          return \`${css.css}\`;
+        }
       };
     `);
   })

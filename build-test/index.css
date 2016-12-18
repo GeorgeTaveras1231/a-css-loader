@@ -1,5 +1,14 @@
-:local(.test) {
+:local(.base) {
+  background-color: black;
+}
+
+:local(.test-local) {
+  composes: base;
   color: red;
+}
+
+:local(.test-import) {
+   composes: component unknown from './src/component.css';
 }
 
 :global(.test-2) {
