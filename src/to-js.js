@@ -14,13 +14,13 @@ function processedExports (exportedSymbols) {
 }
 
 function exportsToJS(exports) {
-  let code = '';
+  let code = 'var locals = {};\n';
 
   for (let symbol of exports) {
     code += `locals[${stringify(symbol.name)}] = ${processedExports(symbol.value)};\n`;
   }
 
-  return `var locals = {};\n${code}`;
+  return code;
 }
 
 function importsToJSArray(imports) {
