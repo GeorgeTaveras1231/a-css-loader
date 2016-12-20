@@ -3,7 +3,7 @@ const postcssScope = require('postcss-modules-scope');
 const postcssExtractImports = require('postcss-modules-extract-imports');
 const loaderUtils = require('loader-utils');
 
-const createImportedName = require('./src/create-imported-name');
+const { createImportedName } = require('./src/import-db');
 const { cssModulesParser, isSymbolsMessage } = require('./src/css-modules-parser-postcss');
 const toJS = require('./src/to-js');
 

@@ -1,10 +1,8 @@
+const importDb = require('./import-db');
+
 function normalizeExports (exportedSymbolsAsString) {
   return exportedSymbolsAsString.split(' ').map((symbol) => {
-    if (symbol[0] === '{') {
-      return JSON.parse(symbol);
-    }
-
-    return {
+    return importDb.get(symbol) || {
       type: 'local',
       name: symbol
     };
@@ -13,7 +11,7 @@ function normalizeExports (exportedSymbolsAsString) {
 
 exports.Imports = class Imports {
   constructor() {
-    this.urls = new Set();
+    this.urls = new Set;
   }
 
   *[Symbol.iterator]() {
@@ -24,8 +22,7 @@ exports.Imports = class Imports {
 
   add(rule) {
     rule.walkDecls((declaration) => {
-      const importMeta = JSON.parse(declaration.prop)
-      this.urls.add(importMeta.path);
+      this.urls.add(importDb.get(declaration.prop).path);
     });
   }
 }
