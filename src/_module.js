@@ -22,22 +22,23 @@ exports.toStringBuilder = function () {
   return function toString() {
     var stack = [this];
     var loaded = {};
+    var node;
 
     if (cssCache) return cssCache;
 
     while(stack.length) {
-      var head = stack.pop();
+      node = stack.pop();
 
-      if (loaded[head.__module__.id]) {
+      if (loaded[node.__module__.id]) {
         continue;
       }
 
-      head.__module__.imports.forEach(function (i) {
+      node.__module__.imports.forEach(function (i) {
         !loaded[i.__module__.id] && stack.push(i);
       });
 
-      loaded[head.__module__.id] = true;
-      cssCache = head.__module__.rawCSS + cssCache;
+      loaded[node.__module__.id] = true;
+      cssCache = node.__module__.rawCSS + cssCache;
     }
 
     return cssCache;
