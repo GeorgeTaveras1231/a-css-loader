@@ -1,11 +1,11 @@
-/* Get unique list of locals
- * This is necessary to deal with locals imported from modules which compose locals that have
- * already been established by the given module
- *
- * Runtime is O(4n) time O(2n) space
- *
- * @param locals [object] dirty locals which may include duplicates
- */
+/** Get unique list of locals
+  * This is necessary to deal with locals imported from modules which compose locals that have
+  * already been established by the given module
+  *
+  * Runtime is O(4n) time O(2n) space
+  *
+  * @param locals {object} dirty locals which may include duplicates
+  */
 exports.cleanLocals = function (locals) {
   var newLocals = {};
   var localSet;
