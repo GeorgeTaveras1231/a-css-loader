@@ -36,7 +36,7 @@ function importsToCode(imports) {
   return `var imports = ${importsToJSArray(imports)};`
 }
 
-module.exports = function (css, imports, exports) {
+module.exports = function toJS (css, imports, exports) {
   const moduleMeta = {
     id: uuid.v4(),
     rawCSS: css
