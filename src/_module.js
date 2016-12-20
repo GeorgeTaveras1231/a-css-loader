@@ -1,3 +1,4 @@
+var hasOwnProperty = Object.prototype.hasOwnProperty;
 /** Get unique list of locals
   * This is necessary to deal with locals imported from modules which compose locals that have
   * already been established by the given module
@@ -11,7 +12,7 @@ exports.cleanLocals = function (locals) {
   var localSet;
 
   for (var key in locals) {
-    if (!locals.hasOwnProperty(key)) continue;
+    if (!hasOwnProperty.call(locals, key)) continue;
 
     /* Use POJO as a string set instead of Set for older browsers */
     localSet = {};
