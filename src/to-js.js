@@ -50,28 +50,7 @@ exportedObject.locals = locals;
 exportedObject.__module__ = ${stringify(moduleMeta)};
 exportedObject.__module__.imports = imports;
 
-exportedObject.toString = function toString() {
-  var stack = [this];
-  var loaded = {};
-  var css = '';
-
-  while(stack.length) {
-    var head = stack.pop();
-
-    if (loaded[head.__module__.id]) {
-      continue;
-    }
-
-    head.__module__.imports.forEach(function (i) {
-      !loaded[i.__module__.id] && stack.push(i);
-    });
-
-    loaded[head.__module__.id] = true;
-    css = head.__module__.rawCSS + css;
-  }
-
-  return css;
-};
+exportedObject.toString = require(${stringify(require.resolve('./_module.js'))}).toStringBuilder();
 
 exportedObject.default = exportedObject;
 module.exports = exportedObject;`;
