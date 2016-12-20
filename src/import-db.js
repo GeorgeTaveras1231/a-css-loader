@@ -1,8 +1,8 @@
 const uuid = require('node-uuid');
 const db = [];
 
-exports.get = function(key) {
-  const match = /%__imported_item__(\d+)__%/.exec(key);
+exports.get = function get(key) {
+  const match = /^%__imported_item__(\d+)__%$/.exec(key);
   return match && db[match[1]];
 };
 
