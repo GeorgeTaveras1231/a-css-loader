@@ -8,9 +8,10 @@
 }
 
 :local(.test-import) {
-   composes: component unknown from './src/component.css';
+  composes: component unknown from './src/component.css';
+  composes: js-module from './src/component-2.css';
 }
 
-:global(.test-2) {
+.test-2 {
   color: blue
 }

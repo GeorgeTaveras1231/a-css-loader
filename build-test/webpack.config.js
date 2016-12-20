@@ -3,7 +3,8 @@ module.exports = {
   entry: path.resolve(__dirname, 'index.css'),
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: 'result.js'
+    filename: 'result.js',
+    libraryTarget: 'umd'
   },
   module: {
     loaders: [

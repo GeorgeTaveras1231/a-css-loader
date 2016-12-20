@@ -3,69 +3,10 @@ const postcssScope = require('postcss-modules-scope');
 const postcssExtractImports = require('postcss-modules-extract-imports');
 const loaderUtils = require('loader-utils');
 
-let importIndex = 0;
-class ImportRule {
-  static createImportedName (importedName, path) {
-    return JSON.stringify({
-      type: 'imported-item',
-      index: importIndex++,
-      name: importedName,
-      path: path
-    });
-  }
+const createImportedName = require('./src/create-imported-name');
+const parserPlugin = require('./src/postcss-parser-plugin');
+const toJS = require('./src/to-js');
 
-  constructor(rule) {
-    const match = /:import\((.+)\)/.exec(rule.selector)
-
-    this.rule = rule;
-    this.url = match[1];
-  }
-
-  imports() {
-    const imports = {};
-    this.rule.walkDecls(function (decl) {
-      imports[decl.prop] = decl.value;
-    });
-
-    return imports;
-  }
-}
-
-class ExportRule {
-  constructor(rule) {
-    this.rule = rule;
-  }
-
-  exports () {
-    const exports = {};
-    this.rule.walkDecls(function (decl) {
-      exports[decl.prop] = decl.value;
-    });
-
-    return exports;
-  }
-}
-
-const plugin = postcss.plugin('parser', function parserPlugin({ callback }) {
-  return function (css) {
-    const imports = [];
-    const exports = [];
-    css.walkRules(function (rule) {
-      if (/:import\(.+\)/.test(rule.selector)) {
-        imports.push(new ImportRule(rule));
-        rule.remove()
-      }
-
-
-      if (rule.selector === ':export') {
-        exports.push(new ExportRule(rule))
-        rule.remove()
-      }
-    });
-
-    callback(imports, exports);
-  }
-});
 
 function detachedPromise() {
   let resolve;
@@ -84,29 +25,15 @@ module.exports = function (source) {
   const [resolveSymbols, symbolsPromise] = detachedPromise();
 
   const processPromise = postcss([
-    postcssExtractImports({
-      createImportedName: ImportRule.createImportedName
-    }),
-    postcssScope({ }),
-    plugin({ callback: (...symbols) => resolveSymbols(symbols) })
-  ]).process(source, {});
+    postcssExtractImports({ createImportedName }),
+    postcssScope(),
+    parserPlugin({ getSymbols: resolveSymbols })
+  ]).process(source);
 
 
   Promise.all([processPromise, symbolsPromise])
-  .then(([css, [imports, exports]]) => {
-    callback(null, `
-      //imports
-      const imports = ${JSON.stringify(imports)};
-
-      // exports
-      const exports = ${JSON.stringify(exports)};
-
-      module.exports = {
-        toString: function toString() {
-          return \`${css.css}\`;
-        }
-      };
-    `);
+  .then(([css, {imports, exports}]) => {
+    callback(null, toJS(css.css, imports, exports));
   })
   .catch((err) => {
     callback(err);
