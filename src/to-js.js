@@ -16,16 +16,16 @@ function processedExports (exportedSymbols) {
 function exportsToJS(exports) {
   let code = '';
 
-  exports.forEach((symbol) => {
+  for (let symbol of exports) {
     code += `locals[${stringify(symbol.name)}] = ${processedExports(symbol.value)};\n`;
-  });
+  }
 
   return `var locals = {};\n${code}`;
 }
 
 function importsToJSArray(imports) {
   const requires = [];
-  for (let [url] of imports.urls.entries()) {
+  for (let url of imports) {
     requires.push(`require(${stringify(url)})`);
   }
 

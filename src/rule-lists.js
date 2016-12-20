@@ -13,18 +13,19 @@ function normalizeExports (exportedSymbolsAsString) {
 
 exports.Imports = class Imports {
   constructor() {
-    this.declarations = [];
     this.urls = new Set();
+  }
 
-    this.eachDeclaration = this.declarations.forEach.bind(this.declarations);
-    this.map = this.declarations.map.bind(this.declarations);
+  *[Symbol.iterator]() {
+    for (let [url] of this.urls.entries()) {
+      yield url;
+    }
   }
 
   add(rule) {
     rule.walkDecls((declaration) => {
       const importMeta = JSON.parse(declaration.prop)
       this.urls.add(importMeta.path);
-      this.declarations.push(importMeta);
     });
   }
 }
@@ -33,7 +34,9 @@ exports.Imports = class Imports {
 exports.Exports = class Exports {
   constructor() {
     this.declarations = [];
-    this.forEach = this.declarations.forEach.bind(this.declarations);
+
+    /* Borrow iterator */
+    this[Symbol.iterator] = Array.prototype[Symbol.iterator].bind(this.declarations);
   }
 
   add(rule) {
