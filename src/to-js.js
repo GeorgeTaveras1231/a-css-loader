@@ -45,13 +45,15 @@ module.exports = function (css, imports, exports) {
   return `
 ${exportsToJS(exports)}
 ${importsToCode(imports)}
+
+var moduleHelpers = require(${stringify(require.resolve('./_module.js'))});
 var exportedObject = {};
-exportedObject.locals = locals;
+exportedObject.locals = moduleHelpers.cleanLocals(locals);
+exportedObject.toString = moduleHelpers.toStringBuilder();
+exportedObject.default = exportedObject;
+
 exportedObject.__module__ = ${stringify(moduleMeta)};
 exportedObject.__module__.imports = imports;
 
-exportedObject.toString = require(${stringify(require.resolve('./_module.js'))}).toStringBuilder();
-
-exportedObject.default = exportedObject;
 module.exports = exportedObject;`;
 };

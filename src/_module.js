@@ -1,3 +1,21 @@
+exports.cleanLocals = function (locals) {
+  var newLocals = {};
+  var localSet;
+  for ( var key in locals ) {
+    if (!locals.hasOwnProperty(key)) continue;
+
+    localSet = {};
+
+    locals[key].split(' ').forEach(function (local) {
+      localSet[local] = true;
+    });
+
+    newLocals[key] = Object.keys(localSet).join(' ');
+  }
+
+  return newLocals;
+}
+
 exports.toStringBuilder = function () {
 
   var cssCache = ''
