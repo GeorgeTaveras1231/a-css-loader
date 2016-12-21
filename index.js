@@ -2,6 +2,7 @@ const postcss = require('postcss');
 const postcssScope = require('postcss-modules-scope');
 const postcssExtractImports = require('postcss-modules-extract-imports');
 const loaderUtils = require('loader-utils');
+const genericNames = require('generic-names');
 
 const { createImportedName } = require('./src/import-db');
 const { cssModulesParser, isSymbolsMessage } = require('./src/css-modules-parser-postcss');
@@ -14,7 +15,7 @@ module.exports = function (source) {
 
   postcss([
     postcssExtractImports({ createImportedName }),
-    postcssScope(),
+    postcssScope({ generateScopedName: genericNames(query.generateScopedName) }),
     cssModulesParser()
   ])
   .process(source)
