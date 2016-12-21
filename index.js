@@ -22,7 +22,7 @@ module.exports = function (source) {
   .then(({ css, messages }) => {
     const {imports, exports} = messages.find(isSymbolsMessage);
 
-    callback(null, toJS(css, imports, exports));
+    callback(null, toJS(css, imports, exports, this));
   })
   .catch((err) => {
     callback(err);

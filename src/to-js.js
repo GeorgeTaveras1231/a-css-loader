@@ -1,4 +1,4 @@
-const uuid = require('node-uuid');
+const loaderUtils = require('loader-utils');
 const stringify = JSON.stringify;
 
 function processedExports (exportedSymbols) {
@@ -8,52 +8,38 @@ function processedExports (exportedSymbols) {
     }
 
     if (symbol.type === 'imported-item') {
-      return `require(${stringify(symbol.path)}).locals[${stringify(symbol.name)}]`;
+      return `[require(${stringify(symbol.path)}), ${stringify(symbol.name)}]`;
     }
-  }).join(' + " " + ');
+  }).join(',');
 }
 
 function exportsToJS(exports) {
-  let code = 'var locals = {};\n';
-
+  var localDefinitions = []
   for (let symbol of exports) {
-    code += `locals[${stringify(symbol.name)}] = ${processedExports(symbol.value)};\n`;
+    localDefinitions.push(`\t${stringify(symbol.name)}: [${processedExports(symbol.value)}]`);
   }
 
-  return code;
+  return `{\n${localDefinitions.join(',\n')}}`;
 }
 
 function importsToJSArray(imports) {
   const requires = [];
   for (let url of imports) {
-    requires.push(`require(${stringify(url)})`);
+    requires.push(`\trequire(${stringify(url)})`);
   }
 
-  return `[${requires.join(',')}]`;
+  return `[\n${requires.join(',\n')}\n]`;
 }
 
-function importsToCode(imports) {
-  return `var imports = ${importsToJSArray(imports)};`
-}
-
-module.exports = function toJS (css, imports, exports) {
-  const moduleMeta = {
-    id: uuid.v4(),
-    rawCSS: css
-  };
-
+module.exports = function toJS (css, imports, exports, loader) {
   return `
-${exportsToJS(exports)}
-${importsToCode(imports)}
+var CSSModule = require(${loaderUtils.stringifyRequest(this, require.resolve('./_module.js'))}).CSSModule;
 
-var moduleHelpers = require(${stringify(require.resolve('./_module.js'))});
-var exportedObject = {};
-exportedObject.locals = moduleHelpers.cleanLocals(locals);
-exportedObject.toString = moduleHelpers.toStringBuilder();
-exportedObject.default = exportedObject;
+exports.default = new CSSModule(
+${stringify(css)},
+${exportsToJS(exports)},
+${importsToJSArray(imports)}
+);
 
-exportedObject.__module__ = ${stringify(moduleMeta)};
-exportedObject.__module__.imports = imports;
-
-module.exports = exportedObject;`;
+module.exports = exports.default;`;
 };

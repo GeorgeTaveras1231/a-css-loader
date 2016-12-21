@@ -1,57 +1,87 @@
-var hasOwnProperty = Object.prototype.hasOwnProperty;
-/** Get unique list of locals
-  * This is necessary to deal with locals imported from modules which compose locals that have
-  * already been established by the given module
-  *
-  * Runtime is O(4n) time O(2n) space
-  *
-  * @param locals {object} dirty locals which may include duplicates
-  */
-exports.cleanLocals = function (locals) {
-  var newLocals = {};
-  var localSet;
+var UUID = require('simply-uuid');
 
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+var stringify = JSON.stringify;
+
+function eachClassName(module, localName, cb) {
+  var importedModule;
+
+  if (typeof module.get === 'function') {
+    importedModules = module.get(localName);
+  } else {
+    importedModules = module.locals[localName];
+  }
+
+  importedModules.split(' ').forEach(cb);
+}
+
+function composeLocals(classNamesOrImports) {
+  var uniqueModules = {};
+
+  classNamesOrImports.forEach(function (classNameOrImport) {
+    /* Its an import if its an array */
+    if (Array.isArray(classNameOrImport)) {
+      eachClassName(classNameOrImport[0], classNameOrImport[1], function (importedClassName) {
+        uniqueModules[importedClassName] = true
+      });
+
+      return
+    }
+
+    uniqueModules[classNameOrImport] = true;
+  });
+
+  return Object.keys(uniqueModules).join(' ');
+}
+
+function processLocals(locals) {
+  var newLocals = {};
   for (var key in locals) {
     if (!hasOwnProperty.call(locals, key)) continue;
 
-    /* Use POJO as a string set instead of Set for older browsers */
-    localSet = {};
-
-    locals[key].split(' ').forEach(function (local) {
-      localSet[local] = true;
-    });
-
-    newLocals[key] = Object.keys(localSet).join(' ');
+    newLocals[key] = composeLocals(locals[key]);
   }
 
   return newLocals;
 }
 
-exports.toStringBuilder = function () {
+function CSSModule(css, locals, imports) {
+  this.locals = processLocals(locals);
 
-  var cssCache = ''
-  return function toString() {
-    var stack = [this];
-    var loaded = {};
-    var node;
+  Object.defineProperty(this, '__css_module__', {
+    writable: false,
+    enumerable: false,
+    configurable: false,
+    value: { id: UUID.generate(), rawCSS: css, imports: imports }
+  });
+}
 
-    if (cssCache) return cssCache;
+CSSModule.prototype.toString = function toString() {
+  var stack = [this];
+  var visited = {};
+  var css = '';
+  var node;
 
-    while(stack.length) {
-      node = stack.pop();
+  while(stack.length) {
+    node = stack.pop().__css_module__;
 
-      if (loaded[node.__module__.id]) {
-        continue;
-      }
+    node.imports.forEach(function (i) {
+      !visited[i.__css_module__.id] && stack.push(i);
+    });
 
-      node.__module__.imports.forEach(function (i) {
-        !loaded[i.__module__.id] && stack.push(i);
-      });
+    visited[node.id] = true;
+    css = node.rawCSS + css;
+  }
 
-      loaded[node.__module__.id] = true;
-      cssCache = node.__module__.rawCSS + cssCache;
-    }
-
-    return cssCache;
-  };
+  return css;
 };
+
+CSSModule.prototype.get = function get(key) {
+  if (!this.locals[key]) {
+    throw new Error('local named ' + stringify(key) + ' is not defined');
+  }
+
+  return this.locals[key];
+};
+
+exports.CSSModule = CSSModule

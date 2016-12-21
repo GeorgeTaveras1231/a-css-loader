@@ -15,6 +15,7 @@
     "postcss": "^5.2.6",
     "postcss-modules": "^0.5.2",
     "postcss-modules-extract-imports": "^1.0.1",
-    "postcss-modules-scope": "^1.0.2"
+    "postcss-modules-scope": "^1.0.2",
+    "simply-uuid": "^1.0.1"
   }
 }
