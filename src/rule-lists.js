@@ -20,7 +20,11 @@ exports.Imports = class Imports {
     }
   }
 
-  add(rule) {
+  addUrl(url) {
+    this.urls.add(url);
+  }
+
+  addFromImportedSymbols(rule) {
     rule.walkDecls((declaration) => {
       this.urls.add(importDb.get(declaration.prop).path);
     });
@@ -36,7 +40,7 @@ exports.Exports = class Exports {
     this[Symbol.iterator] = Array.prototype[Symbol.iterator].bind(this.declarations);
   }
 
-  add(rule) {
+  addFromExportedSymbols(rule) {
     rule.walkDecls((declaration) => {
       this.declarations.push({
         name: declaration.prop, value: normalizeExports(declaration.value)

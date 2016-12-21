@@ -1,3 +1,5 @@
+@import './src/basic-css.css';
+
 :local(.base) {
   background-color: black;
 }
@@ -8,7 +10,7 @@
 }
 
 :local(.test-import) {
-  composes: component unknown from './src/component.css';
+  composes: component from './src/component.css';
   composes: js-module from './src/component-2.css';
 }
 

@@ -1,6 +1,10 @@
 const { Imports, Exports } = require('./rule-lists');
 const postcss = require('postcss');
 
+function cleanImportUrl(url) {
+  return url.replace(/^(['"])(.+)\1$/g, '$2');
+}
+
 exports.isSymbolsMessage = function isSymbolsMessage(message) {
   return message.plugin === 'css-modules-parser' && message.type === 'symbols';
 };
@@ -10,15 +14,21 @@ exports.cssModulesParser = postcss.plugin('css-modules-parser', function parserP
     const imports = new Imports;
     const exports = new Exports;
 
+    css.walkAtRules(function (rule) {
+      if (rule.name === 'import') {
+        imports.addUrl(cleanImportUrl(rule.params));
+      }
+    });
+
     css.walkRules(function (rule) {
       if (/:import\(.+\)/.test(rule.selector)) {
-        imports.add(rule);
+        imports.addFromImportedSymbols(rule);
         rule.remove();
       }
 
 
       if (rule.selector === ':export') {
-        exports.add(rule);
+        exports.addFromExportedSymbols(rule);
         rule.remove();
       }
     });

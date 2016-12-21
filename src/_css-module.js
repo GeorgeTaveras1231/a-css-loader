@@ -5,7 +5,7 @@ var freeze = Object.freeze;
 var stringify = JSON.stringify;
 
 function eachClassName(module, localName, cb) {
-  var importedModule;
+  var importedModules;
 
   if (typeof module.get === 'function') {
     importedModules = module.get(localName);
@@ -23,10 +23,10 @@ function composeLocals(classNamesOrImports) {
     /* Its an import if its an array */
     if (Array.isArray(classNameOrImport)) {
       eachClassName(classNameOrImport[0], classNameOrImport[1], function (importedClassName) {
-        uniqueModules[importedClassName] = true
+        uniqueModules[importedClassName] = true;
       });
 
-      return
+      return;
     }
 
     uniqueModules[classNameOrImport] = true;
@@ -37,10 +37,12 @@ function composeLocals(classNamesOrImports) {
 
 function processLocals(locals) {
   var newLocals = {};
-  for (var key in locals) {
-    if (!hasOwnProperty.call(locals, key)) continue;
+  var key;
 
-    newLocals[key] = composeLocals(locals[key]);
+  for (key in locals) {
+    if (hasOwnProperty.call(locals, key)) {
+      newLocals[key] = composeLocals(locals[key]);
+    }
   }
 
   return newLocals;
@@ -54,7 +56,7 @@ function CSSModule(css, locals, imports) {
       id: UUID.generate(),
       rawCSS: css,
       imports: freeze(imports)
-    });
+    })
   });
 }
 
@@ -64,12 +66,16 @@ CSSModule.prototype.toString = function toString() {
   var css = '';
   var node;
 
+  function addNodeToStack(module) {
+    if(!visited[module.__css_module__.id]) {
+      stack.push(module);
+    }
+  }
+
   while(stack.length) {
     node = stack.pop().__css_module__;
 
-    node.imports.forEach(function (i) {
-      !visited[i.__css_module__.id] && stack.push(i);
-    });
+    node.imports.forEach(addNodeToStack);
 
     visited[node.id] = true;
     css = node.rawCSS + css;
@@ -86,4 +92,4 @@ CSSModule.prototype.get = function get(key) {
   return this.locals[key];
 };
 
-exports.CSSModule = CSSModule
+exports.CSSModule = CSSModule;
