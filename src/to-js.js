@@ -22,7 +22,7 @@ function exportsToJS(exports) {
   return `{\n${localDefinitions.join(',\n')}}`;
 }
 
-function importsToJSArray(imports) {
+function importsToJS(imports) {
   const requires = [];
   for (let url of imports) {
     requires.push(`\trequire(${stringify(url)})`);
@@ -32,13 +32,14 @@ function importsToJSArray(imports) {
 }
 
 module.exports = function toJS (css, imports, exports, loader) {
+  const safeCSSModulePath = loaderUtils.stringifyRequest(this, require.resolve('./_css-module.js')) ;
   return `
-var CSSModule = require(${loaderUtils.stringifyRequest(this, require.resolve('./_module.js'))}).CSSModule;
+var CSSModule = require(${safeCSSModulePath}).CSSModule;
 
 exports.default = new CSSModule(
 ${stringify(css)},
 ${exportsToJS(exports)},
-${importsToJSArray(imports)}
+${importsToJS(imports)}
 );
 
 module.exports = exports.default;`;
