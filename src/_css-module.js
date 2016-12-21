@@ -1,6 +1,7 @@
 var UUID = require('simply-uuid');
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
+var freeze = Object.freeze;
 var stringify = JSON.stringify;
 
 function eachClassName(module, localName, cb) {
@@ -49,10 +50,11 @@ function CSSModule(css, locals, imports) {
   this.locals = processLocals(locals);
 
   Object.defineProperty(this, '__css_module__', {
-    writable: false,
-    enumerable: false,
-    configurable: false,
-    value: { id: UUID.generate(), rawCSS: css, imports: imports }
+    value: freeze({
+      id: UUID.generate(),
+      rawCSS: css,
+      imports: freeze(imports)
+    });
   });
 }
 
