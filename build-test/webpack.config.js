@@ -1,6 +1,7 @@
 const path = require('path');
 module.exports = {
-  entry: path.resolve(__dirname, 'index.css'),
+  context: path.resolve(__dirname),
+  entry: './index.css',
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: 'result.js',

@@ -1,5 +1,0 @@
-:local(.js-module) {
-  composes: component from './component.css';
-
-  background-color: red;
-}

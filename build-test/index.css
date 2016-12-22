@@ -1,19 +1,22 @@
-@import './src/basic-css.css';
+@import './src/imported-styles.css';
 
-:local(.base) {
+:local(.local) {
   background-color: black;
 }
 
-:local(.test-local) {
-  composes: base;
+:local(.composed-local) {
+  composes: local;
   color: red;
 }
 
-:local(.test-import) {
-  composes: component from './src/component.css';
-  composes: js-module from './src/component-2.css';
+:local(.composed-import) {
+  composes: imported-local from './src/imported-locals.css';
 }
 
-.test-2 {
+.global-class {
   color: blue
+}
+
+:export {
+  exported-value: true
 }

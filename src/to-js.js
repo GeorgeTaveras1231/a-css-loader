@@ -32,7 +32,7 @@ function importsToJS(imports) {
 }
 
 module.exports = function toJS (css, imports, exports, loader) {
-  const safeCSSModulePath = loaderUtils.stringifyRequest(this, require.resolve('./_css-module.js')) ;
+  const safeCSSModulePath = loaderUtils.stringifyRequest(loader, require.resolve('./_css-module.js')) ;
   return `
 var CSSModule = require(${safeCSSModulePath}).CSSModule;
 

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/build-test.js"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +17,10 @@
     "postcss-modules-extract-imports": "^1.0.1",
     "postcss-modules-scope": "^1.0.2",
     "simply-uuid": "^1.0.1"
+  },
+  "devDependencies": {
+    "memory-fs": "^0.4.1",
+    "mocha": "^3.2.0",
+    "require-from-string": "^1.2.1"
   }
 }
