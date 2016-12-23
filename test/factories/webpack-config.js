@@ -3,7 +3,7 @@ const extend = require('extend');
 
 const fixturesPath = path.resolve.bind(null, __dirname, '..', 'fixtures');
 
-module.exports = function () {
+module.exports = function ({ query }) {
 
   return {
     context: fixturesPath(),
@@ -18,10 +18,9 @@ module.exports = function () {
     module: {
       loaders: [
         {
+          query,
           test: /\.css$/,
-          loaders: [
-            'a-css-loader?generateScopedName=ff_[local]_[hash:3]'
-          ]
+          loader: 'a-css-loader'
         }
       ],
     },

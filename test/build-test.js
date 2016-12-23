@@ -7,27 +7,30 @@ const webpackCompile = require('./support/webpack-compile');
 
 describe('build', () => {
   before(function (done) {
-    webpackCompile(configFactory()).then((modules) => {
+    const webpackConfig = configFactory({
+      query: { generateScopedName: 'modules-test__[local]' }
+    });
+
+    webpackCompile(webpackConfig).then((modules) => {
       this.cssModule = modules['modules-test.js'];
     })
     .then(done);
   });
 
   it('exports module locals', function () {
-    assertIncludesClassPattern(this.cssModule.get('local'), /ff_local_/);
+    assertIncludesClassPattern(this.cssModule.get('local'), /^modules-test__local$/);
   });
 
   it('exports composed module locals', function () {
     const classList = this.cssModule.get('composed-local');
-    assertIncludesClassPattern(classList, /^ff_local_/);
-    assertIncludesClassPattern(classList, /^ff_composed-local_/);
+    assertIncludesClassPattern(classList, /^modules-test__local$/);
+    assertIncludesClassPattern(classList, /^modules-test__composed-local$/);
   });
-
 
   it('exports locals composed from imports', function () {
     const classList = this.cssModule.get('composed-import');
-    assertIncludesClassPattern(classList, /^ff_imported-local_/);
-    assertIncludesClassPattern(classList, /^ff_composed-import_/);
+    assertIncludesClassPattern(classList, /^modules-test__imported-local$/);
+    assertIncludesClassPattern(classList, /^modules-test__composed-import$/);
 
     /* Even if module is not a css file */
     assertIncludesClassPattern(classList, /^simple-module$/);
