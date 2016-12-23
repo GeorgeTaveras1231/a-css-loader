@@ -5,44 +5,53 @@ const assertIncludesClassPattern = require('./support/assert-includes-class-patt
 const configFactory = require('./factories/webpack-config');
 const webpackCompile = require('./support/webpack-compile');
 
+const webpackConfig = configFactory({
+  query: { generateScopedName: 'modules-test__[local]' }
+});
+
 describe('build', () => {
   before(function (done) {
-    const webpackConfig = configFactory({
-      query: { generateScopedName: 'modules-test__[local]' }
-    });
-
     webpackCompile(webpackConfig).then((modules) => {
       this.cssModule = modules['modules-test.js'];
     })
     .then(done);
   });
 
-  it('exports module locals', function () {
-    assertIncludesClassPattern(this.cssModule.get('local'), /^modules-test__local$/);
+  describe('modules', function () {
+    it('exports module locals', function () {
+      assertIncludesClassPattern(this.cssModule.get('local'), /^modules-test__local$/);
+    });
+
+    it('exports composed module locals', function () {
+      const classList = this.cssModule.get('composed-local');
+      assertIncludesClassPattern(classList, /^modules-test__local$/);
+      assertIncludesClassPattern(classList, /^modules-test__composed-local$/);
+    });
+
+    it('exports locals composed from imports', function () {
+      const classList = this.cssModule.get('composed-import');
+      assertIncludesClassPattern(classList, /^modules-test__imported-local$/);
+      assertIncludesClassPattern(classList, /^modules-test__composed-import$/);
+
+      /* Even if module is not a css file */
+      assertIncludesClassPattern(classList, /^simple-module$/);
+    });
+
+    it('exports custom values', function () {
+      const value = this.cssModule.get('exported-value');
+
+      assert.equal(value, 'true');
+    });
   });
 
-  it('exports composed module locals', function () {
-    const classList = this.cssModule.get('composed-local');
-    assertIncludesClassPattern(classList, /^modules-test__local$/);
-    assertIncludesClassPattern(classList, /^modules-test__composed-local$/);
-  });
+  describe('css', function () {
+    before(function () {
+      this.css = this.cssModule.toString();
+    });
 
-  it('exports locals composed from imports', function () {
-    const classList = this.cssModule.get('composed-import');
-    assertIncludesClassPattern(classList, /^modules-test__imported-local$/);
-    assertIncludesClassPattern(classList, /^modules-test__composed-import$/);
-
-    /* Even if module is not a css file */
-    assertIncludesClassPattern(classList, /^simple-module$/);
-  });
-
-  it('exports custom values', function () {
-    const value = this.cssModule.get('exported-value');
-
-    assert.equal(value, 'true');
-  });
-
-  it('generate the proper css', function () {
-    const result = this.cssModule.toString();
+    it('removes @imports', function () {
+      const result = this.cssModule.toString();
+      assert.ok(result.indexOf('@import') === -1);
+    });
   });
 });
