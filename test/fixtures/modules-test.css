@@ -11,6 +11,7 @@
 
 :local(.composed-import) {
   composes: imported-local from './src/imported-locals.css';
+  composes: simple-module from './src/simple-module';
 }
 
 .global-class {

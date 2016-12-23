@@ -19,6 +19,8 @@
     "simply-uuid": "^1.0.1"
   },
   "devDependencies": {
+    "css": "^2.2.1",
+    "extend": "^3.0.0",
     "memory-fs": "^0.4.1",
     "mocha": "^3.2.0",
     "require-from-string": "^1.2.1"

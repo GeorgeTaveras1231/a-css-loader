@@ -1,35 +1,16 @@
 const assert = require('assert');
-const path = require('path');
-const Module = require('module');
-const fs = require('fs');
-const requireFromString = require('require-from-string');
+const css = require('css');
 
-const webpack = require('webpack');
-const webpackConfig = require('../build-test/webpack.config');
-const MemoryFs = require('memory-fs');
-
-function assertIncludesClassPattern(classListString, pattern) {
-  const regexp = new RegExp(pattern);
-  const classList = classListString.split(' ');
-
-  assert(classList.some(c => regexp.test(c)),
-    `Expected ${JSON.stringify(classListString)} to include pattern ${JSON.stringify(pattern.toString())}`);
-}
+const assertIncludesClassPattern = require('./support/assert-includes-class-pattern');
+const configFactory = require('./factories/webpack-config');
+const webpackCompile = require('./support/webpack-compile');
 
 describe('build', () => {
   before(function (done) {
-    const compiler = webpack(webpackConfig)
-    const mfs = new MemoryFs;
-
-    compiler.outputFileSystem = mfs;
-    compiler.run((err, stats) => {
-      const { compilation } = stats;
-      const bundlePath = path.join(compilation.outputOptions.path, compilation.outputOptions.filename);
-      const code = compilation.assets['result.js'].source();
-
-      this.cssModule = requireFromString(code);
-      done();
-    });
+    webpackCompile(configFactory()).then((modules) => {
+      this.cssModule = modules['modules-test.js'];
+    })
+    .then(done);
   });
 
   it('exports module locals', function () {
@@ -47,10 +28,18 @@ describe('build', () => {
     const classList = this.cssModule.get('composed-import');
     assertIncludesClassPattern(classList, /^ff_imported-local_/);
     assertIncludesClassPattern(classList, /^ff_composed-import_/);
+
+    /* Even if module is not a css file */
+    assertIncludesClassPattern(classList, /^simple-module$/);
   });
 
   it('exports custom values', function () {
     const value = this.cssModule.get('exported-value');
+
     assert.equal(value, 'true');
+  });
+
+  it('generate the proper css', function () {
+    const result = this.cssModule.toString();
   });
 });

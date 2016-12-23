@@ -64,21 +64,31 @@ CSSModule.prototype.toString = function toString() {
   var stack = [this];
   var visited = {};
   var css = '';
+  var module;
   var node;
 
   function addNodeToStack(module) {
-    if(!visited[module.__css_module__.id]) {
+    // if(typeof module.__css_module__ !== 'object')
       stack.push(module);
-    }
+
+    // if(!visited[module.__css_module__.id]) {
+      // stack.push(module);
+    // }
   }
 
   while(stack.length) {
-    node = stack.pop().__css_module__;
+    module = stack.pop();
 
-    node.imports.forEach(addNodeToStack);
+    if (typeof module.__css_module__ === 'object') {
+      node = module.__css_module__;
 
-    visited[node.id] = true;
-    css = node.rawCSS + css;
+      node.imports.forEach(addNodeToStack);
+
+      visited[node.id] = true;
+      css = node.rawCSS + css;
+    } else {
+      css = module.toString() + css;
+    }
   }
 
   return css;
