@@ -3,18 +3,23 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "config": {
+    "test-files": "test/cases/*-test.js"
+  },
   "scripts": {
-    "test": "mocha test/build-test.js"
+    "test": "mocha $npm_package_config_test_files"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "extend": "^3.0.0",
     "loader-utils": "^0.2.16",
     "node-uuid": "^1.4.7",
     "postcss": "^5.2.6",
     "postcss-modules": "^0.5.2",
     "postcss-modules-extract-imports": "^1.0.1",
+    "postcss-modules-local-by-default": "^1.1.1",
     "postcss-modules-scope": "^1.0.2",
     "simply-uuid": "^1.0.1"
   },

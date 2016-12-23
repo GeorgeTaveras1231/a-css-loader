@@ -3,16 +3,13 @@ const extend = require('extend');
 
 const fixturesPath = path.resolve.bind(null, __dirname, '..', 'fixtures');
 
-module.exports = function ({ query }) {
-
+module.exports = function ({ query = {}, entry, filename = 'result' }) {
   return {
     context: fixturesPath(),
-    entry: {
-      'modules-test': './modules-test.css'
-    },
+    entry: entry,
     output: {
       path: fixturesPath('build'),
-      filename: '[name].js',
+      filename: `${filename}.js`,
       libraryTarget: 'umd'
     },
     module: {

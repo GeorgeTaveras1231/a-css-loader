@@ -26,7 +26,7 @@ module.exports = function (webpackConfig) {
       } else {
         const { compilation } = stats;
 
-        resolve(getModules(compilation.assets));
+        resolve(getModules(compilation.assets), compilation);
       }
     });
   });

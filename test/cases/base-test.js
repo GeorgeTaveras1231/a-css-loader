@@ -1,18 +1,22 @@
 const assert = require('assert');
 const css = require('css');
 
-const assertIncludesClassPattern = require('./support/assert-includes-class-pattern');
-const configFactory = require('./factories/webpack-config');
-const webpackCompile = require('./support/webpack-compile');
+const assertIncludesClassPattern = require('../support/assert-includes-class-pattern');
+const configFactory = require('../factories/webpack-config');
+const webpackCompile = require('../support/webpack-compile');
 
 const webpackConfig = configFactory({
-  query: { generateScopedName: 'modules-test__[local]' }
+  entry: './modules-test.css',
+  query: {
+    generateScopedName: 'modules-test__[local]',
+    mode: 'global'
+  },
 });
 
 describe('build', () => {
   before(function (done) {
     webpackCompile(webpackConfig).then((modules) => {
-      this.cssModule = modules['modules-test.js'];
+      this.cssModule = modules['result.js'];
     })
     .then(done);
   });
@@ -50,8 +54,7 @@ describe('build', () => {
     });
 
     it('removes @imports', function () {
-      const result = this.cssModule.toString();
-      assert.ok(result.indexOf('@import') === -1);
+      assert.ok(this.css.indexOf('@import') === -1);
     });
   });
 });

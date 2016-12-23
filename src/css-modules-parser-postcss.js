@@ -14,11 +14,9 @@ exports.cssModulesParser = postcss.plugin('css-modules-parser', function parserP
     const imports = new Imports;
     const exports = new Exports;
 
-    css.walkAtRules(function (rule) {
-      if (rule.name === 'import') {
-        imports.addUrl(cleanImportUrl(rule.params));
-        rule.remove();
-      }
+    css.walkAtRules('import', function (rule) {
+      imports.addUrl(cleanImportUrl(rule.params));
+      rule.remove();
     });
 
     css.walkRules(function (rule) {
