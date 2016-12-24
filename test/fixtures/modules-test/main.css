@@ -1,4 +1,4 @@
-@import './src/imported-styles.css';
+@import './imported-styles.css';
 
 :local(.local) {
   background-color: black;
@@ -10,8 +10,8 @@
 }
 
 :local(.composed-import) {
-  composes: imported-local from './src/imported-locals.css';
-  composes: simple-module from './src/simple-module';
+  composes: imported-local from './imported-locals.css';
+  composes: simple-module from './simple-module';
 }
 
 .global-class {

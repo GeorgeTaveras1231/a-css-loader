@@ -6,7 +6,7 @@ const configFactory = require('../factories/webpack-config');
 const webpackCompile = require('../support/webpack-compile');
 
 const webpackConfig = configFactory({
-  entry: './modules-test.css',
+  context: 'modules-test',
   query: {
     generateScopedName: 'modules-test__[local]',
     mode: 'global'

@@ -3,7 +3,7 @@ const extend = require('extend');
 
 const fixturesPath = path.resolve.bind(null, __dirname, '..', 'fixtures');
 
-module.exports = function ({ query = {}, entry, context = '', filename = 'result' }) {
+module.exports = function ({ query = {}, entry = './main.css', context = '', filename = 'result' }) {
   return {
     context: fixturesPath(context),
     entry: entry,

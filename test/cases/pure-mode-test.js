@@ -6,7 +6,7 @@ const configFactory = require('../factories/webpack-config');
 const webpackCompile = require('../support/webpack-compile');
 
 const webpackConfig = configFactory({
-  entry: './pure-mode-test.css',
+  context: 'pure-mode-test',
   query: {
     generateScopedName: 'pure__[local]',
     mode: 'pure'
