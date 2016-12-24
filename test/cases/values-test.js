@@ -1,7 +1,6 @@
 const assert = require('assert');
 const css = require('css');
 
-const assertIncludesClassPattern = require('../support/assert-includes-class-pattern');
 const configFactory = require('../factories/webpack-config');
 const webpackCompile = require('../support/webpack-compile');
 
