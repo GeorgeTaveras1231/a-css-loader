@@ -26,7 +26,9 @@ exports.Imports = class Imports {
 
   addFromImportedSymbols(rule) {
     rule.walkDecls((declaration) => {
-      this.urls.add(importDb.get(declaration.prop).path);
+      const importedItem = importDb.get(declaration.prop)
+
+      this.urls.add(importedItem.path);
     });
   }
 }

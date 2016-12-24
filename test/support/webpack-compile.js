@@ -26,7 +26,11 @@ module.exports = function (webpackConfig) {
       } else {
         const { compilation } = stats;
 
-        resolve(getModules(compilation.assets), compilation);
+        if ( compilation.errors.length > 0 ) {
+          reject(compilation.errors)
+        } else {
+          resolve(getModules(compilation.assets));
+        }
       }
     });
   });

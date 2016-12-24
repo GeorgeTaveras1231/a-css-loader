@@ -1,0 +1,8 @@
+@value small-font: 10px;
+@value special-red from './additional-values.css';
+
+.test {
+  font-size: small-font;
+  color: special-red;
+}
+

@@ -1,4 +1,6 @@
 const loaderUtils = require('loader-utils');
+const importDB = require('./import-db');
+
 const stringify = JSON.stringify;
 
 function processedExports (exportedSymbols) {
@@ -33,11 +35,18 @@ function importsToJS(imports) {
 
 module.exports = function toJS (css, imports, exports, loader) {
   const safeCSSModulePath = loaderUtils.stringifyRequest(loader, require.resolve('./_css-module.js')) ;
+
+  const processedCSS = stringify(css).replace(/%__imported_item__\d+__%/g, function (match) {
+    const i = importDB.get(match);
+
+    return `" + require(${stringify(i.path)}).locals[${stringify(i.name)}] + "`;
+  });
+
   return `
 var CSSModule = require(${safeCSSModulePath}).CSSModule;
 
 exports.default = new CSSModule(
-${stringify(css)},
+${processedCSS},
 ${exportsToJS(exports)},
 ${importsToJS(imports)}
 );

@@ -68,12 +68,7 @@ CSSModule.prototype.toString = function toString() {
   var node;
 
   function addNodeToStack(module) {
-    // if(typeof module.__css_module__ !== 'object')
-      stack.push(module);
-
-    // if(!visited[module.__css_module__.id]) {
-      // stack.push(module);
-    // }
+    stack.push(module);
   }
 
   while(stack.length) {

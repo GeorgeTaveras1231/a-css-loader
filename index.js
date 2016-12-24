@@ -1,7 +1,10 @@
 const postcss = require('postcss');
-const postcssScope = require('postcss-modules-scope');
-const postcssExtractImports = require('postcss-modules-extract-imports');
+
+const modulesScope = require('postcss-modules-scope');
+const extractImports = require('postcss-modules-extract-imports');
 const localByDefault = require('postcss-modules-local-by-default');
+const moduleValues = require('postcss-modules-values');
+
 const loaderUtils = require('loader-utils');
 const genericNames = require('generic-names');
 const extend = require('extend');
@@ -11,20 +14,21 @@ const { cssModulesParser, isSymbolsMessage } = require('./src/css-modules-parser
 const toJS = require('./src/to-js');
 
 const LOADER_NAME = 'a-css-loader';
+const DEFAULT_OPTIONS = Object.freeze({
+  mode: 'pure'
+});
 
 module.exports = function (source) {
-  this.cacheable();
+  const config = extend({}, DEFAULT_OPTIONS, loaderUtils.getLoaderConfig(this, LOADER_NAME));
   const callback = this.async();
-  const config = extend({
-    mode: 'pure'
-  }, loaderUtils.getLoaderConfig(this, LOADER_NAME));
+
+  this.cacheable();
 
   postcss([
-    localByDefault({
-      mode: config.mode
-    }),
-    postcssExtractImports({ createImportedName }),
-    postcssScope({ generateScopedName: genericNames(config.generateScopedName) }),
+    localByDefault({ mode: config.mode }),
+    extractImports({ createImportedName }),
+    moduleValues({ createImportedName }),
+    modulesScope({ generateScopedName: genericNames(config.generateScopedName) }),
     cssModulesParser()
   ])
   .process(source)

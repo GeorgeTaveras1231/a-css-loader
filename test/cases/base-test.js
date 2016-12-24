@@ -18,7 +18,8 @@ describe('build', () => {
     webpackCompile(webpackConfig).then((modules) => {
       this.cssModule = modules['result.js'];
     })
-    .then(done);
+    .then(done)
+    .catch(done);
   });
 
   describe('modules', function () {

@@ -13,17 +13,16 @@ const webpackConfig = configFactory({
   }
 });
 
-describe('build', () => {
+describe('pure-mode', () => {
   before(function (done) {
     webpackCompile(webpackConfig).then((modules) => {
       this.cssModule = modules['result.js'];
     })
-    .then(done);
+    .then(done)
+    .catch(done);
   });
 
-  describe('modules', function () {
-    it('exports module locals', function () {
-      assertIncludesClassPattern(this.cssModule.get('a-class'), 'pure__a-class');
-    });
+  it('exports module locals', function () {
+    assertIncludesClassPattern(this.cssModule.get('a-class'), 'pure__a-class');
   });
 });
