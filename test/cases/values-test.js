@@ -2,7 +2,7 @@ const assert = require('assert');
 const css = require('css');
 
 const configFactory = require('../factories/webpack-config');
-const webpackCompile = require('../support/webpack-compile');
+const setup = require('../support/test-setup');
 
 const webpackConfig = configFactory({
   context: 'values-test',
@@ -13,13 +13,7 @@ const webpackConfig = configFactory({
 });
 
 describe('@value', () => {
-  before(function (done) {
-    webpackCompile(webpackConfig).then((modules) => {
-      this.cssModule = modules['result.js'];
-    })
-    .then(done)
-    .catch(done);
-  });
+  before(setup(webpackConfig));
 
   it('exports the values', function () {
     assert.equal(this.cssModule.get('small-font'), '10px');

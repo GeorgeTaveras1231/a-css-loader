@@ -3,7 +3,7 @@ const css = require('css');
 
 const assertIncludesClassPattern = require('../support/assert-includes-class-pattern');
 const configFactory = require('../factories/webpack-config');
-const webpackCompile = require('../support/webpack-compile');
+const setup = require('../support/test-setup');
 
 const webpackConfig = configFactory({
   context: 'pure-mode-test',
@@ -14,13 +14,7 @@ const webpackConfig = configFactory({
 });
 
 describe('pure-mode', () => {
-  before(function (done) {
-    webpackCompile(webpackConfig).then((modules) => {
-      this.cssModule = modules['result.js'];
-    })
-    .then(done)
-    .catch(done);
-  });
+  before(setup(webpackConfig));
 
   it('exports module locals', function () {
     assertIncludesClassPattern(this.cssModule.get('a-class'), 'pure__a-class');

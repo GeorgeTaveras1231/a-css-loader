@@ -4,6 +4,7 @@ const css = require('css');
 const assertIncludesClassPattern = require('../support/assert-includes-class-pattern');
 const configFactory = require('../factories/webpack-config');
 const webpackCompile = require('../support/webpack-compile');
+const setup = require('../support/test-setup');
 
 const webpackConfig = configFactory({
   context: 'modules-test',
@@ -14,13 +15,7 @@ const webpackConfig = configFactory({
 });
 
 describe('build', () => {
-  before(function (done) {
-    webpackCompile(webpackConfig).then((modules) => {
-      this.cssModule = modules['result.js'];
-    })
-    .then(done)
-    .catch(done);
-  });
+  before(setup(webpackConfig));
 
   describe('modules', function () {
     it('exports module locals', function () {
