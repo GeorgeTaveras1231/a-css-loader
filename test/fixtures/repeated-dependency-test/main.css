@@ -1,0 +1,6 @@
+@import './module-1.css';
+@import './module-2.css';
+
+.main {
+  color: red;
+}

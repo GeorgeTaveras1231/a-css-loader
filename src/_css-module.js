@@ -1,8 +1,12 @@
-var UUID = require('simply-uuid');
-
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var freeze = Object.freeze;
 var stringify = JSON.stringify;
+
+function reverseEach(array, cb, thisArg) {
+  for (var i = array.length - 1; i >= 0; i-- ) {
+    cb.call(thisArg || null, array[i], i);
+  }
+}
 
 function eachClassName(module, localName, cb) {
   var importedModules;
@@ -48,12 +52,13 @@ function processLocals(locals) {
   return newLocals;
 }
 
+var moduleIdCounter = 0;
 function CSSModule(css, locals, imports) {
   this.locals = processLocals(locals);
 
   Object.defineProperty(this, '__css_module__', {
     value: freeze({
-      id: UUID.generate(),
+      id: moduleIdCounter++,
       rawCSS: css,
       imports: freeze(imports)
     })
@@ -61,32 +66,35 @@ function CSSModule(css, locals, imports) {
 }
 
 CSSModule.prototype.toString = function toString() {
-  var stack = [this];
-  var pushToStack = function (module) {
-    stack.push(module);
-  };
-
+  var toVisit = [this];
+  var toProcess = [];
   var visited = {};
   var css = '';
-  var module;
-  var node;
 
+  var currentModule;
+  var currentMetadata;
 
-  while(stack.length) {
-    module = stack.pop();
+  function planVisit(module) { toVisit.push(module); }
 
-    if (typeof module.__css_module__ === 'object') {
-      node = module.__css_module__;
+  while(toVisit.length) {
+    currentModule = toVisit.pop();
 
-      if(visited[node.id]) {
-        continue;
-      }
+    if (typeof currentModule.__css_module__ === 'object') {
+      currentMetadata = currentModule.__css_module__;
 
-      node.imports.forEach(pushToStack);
+      if(visited[currentMetadata.id]) continue;
 
-      visited[node.id] = true;
-      css = node.rawCSS + css;
+      reverseEach(currentMetadata.imports, planVisit);
+
+      visited[currentMetadata.id] = true;
+
+      toProcess.push(currentModule);
     }
+  }
+
+  while(toProcess.length) {
+    currentModule = toProcess.pop();
+    css += currentModule.__css_module__.rawCSS;
   }
 
   return css;

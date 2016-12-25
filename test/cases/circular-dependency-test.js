@@ -10,7 +10,6 @@ describe('circular dependency', () => {
 
   it('generates the proper css', function () {
     const style = css.parse(this.cssModule.toString());
-    console.log(this.cssModule.toString());
     assert.equal(this.cssModule.toString().indexOf('Object'), -1);
     assert.equal(style.stylesheet.rules.length, 2);
   });
