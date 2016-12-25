@@ -67,7 +67,6 @@ function CSSModule(css, locals, imports) {
 
 CSSModule.prototype.toString = function toString() {
   var toVisit = [this];
-  var toProcess = [];
   var visited = {};
   var css = '';
 
@@ -88,13 +87,8 @@ CSSModule.prototype.toString = function toString() {
 
       visited[currentMetadata.id] = true;
 
-      toProcess.push(currentModule);
+      css = currentMetadata.rawCSS + css;
     }
-  }
-
-  while(toProcess.length) {
-    currentModule = toProcess.pop();
-    css += currentModule.__css_module__.rawCSS;
   }
 
   return css;
