@@ -62,14 +62,15 @@ function CSSModule(css, locals, imports) {
 
 CSSModule.prototype.toString = function toString() {
   var stack = [this];
+  var pushToStack = function (module) {
+    stack.push(module);
+  };
+
   var visited = {};
   var css = '';
   var module;
   var node;
 
-  function addNodeToStack(module) {
-    stack.push(module);
-  }
 
   while(stack.length) {
     module = stack.pop();
@@ -77,12 +78,14 @@ CSSModule.prototype.toString = function toString() {
     if (typeof module.__css_module__ === 'object') {
       node = module.__css_module__;
 
-      node.imports.forEach(addNodeToStack);
+      if(visited[node.id]) {
+        continue;
+      }
+
+      node.imports.forEach(pushToStack);
 
       visited[node.id] = true;
       css = node.rawCSS + css;
-    } else {
-      css = module.toString() + css;
     }
   }
 

@@ -50,6 +50,7 @@ describe('build', () => {
     });
 
     it('removes @imports', function () {
+      // console.log(this.css)
       assert.ok(this.css.indexOf('@import') === -1);
     });
   });

@@ -3,7 +3,7 @@ const postcss = require('postcss');
 const modulesScope = require('postcss-modules-scope');
 const extractImports = require('postcss-modules-extract-imports');
 const localByDefault = require('postcss-modules-local-by-default');
-const moduleValues = require('postcss-modules-values');
+const modulesValues = require('postcss-modules-values');
 
 const loaderUtils = require('loader-utils');
 const genericNames = require('generic-names');
@@ -15,20 +15,25 @@ const toJS = require('./src/to-js');
 
 const LOADER_NAME = 'a-css-loader';
 const DEFAULT_OPTIONS = Object.freeze({
-  mode: 'pure'
+  mode: 'pure',
+  generateScopedName: '[local]--[hash:5]'
 });
 
 module.exports = function (source) {
-  const config = extend({}, DEFAULT_OPTIONS, loaderUtils.getLoaderConfig(this, LOADER_NAME));
+  const {
+    mode,
+    generateScopedName
+  } = extend({}, DEFAULT_OPTIONS, loaderUtils.getLoaderConfig(this, LOADER_NAME));
+
   const callback = this.async();
 
   this.cacheable();
 
   postcss([
-    localByDefault({ mode: config.mode }),
+    localByDefault({ mode }),
     extractImports({ createImportedName }),
-    moduleValues({ createImportedName }),
-    modulesScope({ generateScopedName: genericNames(config.generateScopedName) }),
+    modulesValues({ createImportedName }),
+    modulesScope({ generateScopedName: genericNames(generateScopedName) }),
     cssModulesParser()
   ])
   .process(source)
