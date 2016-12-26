@@ -23,6 +23,10 @@ function eachClassName(module, localName, cb) {
 function composeLocals(classNamesOrImports) {
   var uniqueModules = {};
 
+  if (typeof classNamesOrImports === 'string') {
+    classNamesOrImports = classNamesOrImports.split(' ');
+  }
+
   classNamesOrImports.forEach(function (classNameOrImport) {
     /* Its an import if its an array */
     if (Array.isArray(classNameOrImport)) {
@@ -52,6 +56,22 @@ function processLocals(locals) {
   return newLocals;
 }
 
+function processImports(imports) {
+  return imports.map(function (module) {
+    if (module instanceof CSSModule) {
+      return module;
+    }
+
+    var css = typeof module.toCssString === 'function' ? module.toCssString() : '';
+
+    return new CSSModule(
+      css,
+      module.locals,
+      []
+    )
+  });
+}
+
 var moduleIdCounter = 0;
 function CSSModule(css, locals, imports) {
   this.locals = processLocals(locals);
@@ -60,7 +80,7 @@ function CSSModule(css, locals, imports) {
     value: freeze({
       id: moduleIdCounter++,
       rawCSS: css,
-      imports: freeze(imports)
+      imports: freeze(processImports(imports))
     })
   });
 }
@@ -78,17 +98,15 @@ CSSModule.prototype.toString = function toString() {
   while(toVisit.length) {
     currentModule = toVisit.pop();
 
-    if (typeof currentModule.__css_module__ === 'object') {
-      currentMetadata = currentModule.__css_module__;
+    currentMetadata = currentModule.__css_module__;
 
-      if(visited[currentMetadata.id]) continue;
+    if (visited[currentMetadata.id]) continue;
 
-      reverseEach(currentMetadata.imports, planVisit);
+    reverseEach(currentMetadata.imports, planVisit);
 
-      visited[currentMetadata.id] = true;
+    visited[currentMetadata.id] = true;
 
-      css = currentMetadata.rawCSS + css;
-    }
+    css = currentMetadata.rawCSS + css;
   }
 
   return css;

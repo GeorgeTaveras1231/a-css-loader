@@ -2,7 +2,7 @@ module.exports = {
   locals: {
     'simple-module': 'simple-module'
   },
-  toString: function () {
+  toCssString: function () {
     return '.simple-module { color: red; }\n';
   }
 };

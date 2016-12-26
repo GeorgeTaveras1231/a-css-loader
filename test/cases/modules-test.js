@@ -47,11 +47,19 @@ describe('build', () => {
   describe('css', function () {
     before(function () {
       this.css = this.cssModule.toString();
+      this.parsedCSS = css.parse(this.css);
     });
 
     it('removes @imports', function () {
-      // console.log(this.css)
       assert.ok(this.css.indexOf('@import') === -1);
+    });
+
+    it('includes the css from js module', function () {
+      const ruleFromJs = this.parsedCSS.stylesheet.rules.find((rule) => {
+        return rule.selectors.find((selector) => selector === '.simple-module');
+      });
+
+      assert(ruleFromJs);
     });
   });
 });
