@@ -2,9 +2,9 @@ var hasOwnProperty = Object.prototype.hasOwnProperty;
 var freeze = Object.freeze;
 var stringify = JSON.stringify;
 
-function reverseEach(array, cb, thisArg) {
+function reverseEach(array, cb) {
   for (var i = array.length - 1; i >= 0; i-- ) {
-    cb.call(thisArg || null, array[i], i);
+    cb.call(null, array[i], i);
   }
 }
 
@@ -91,22 +91,19 @@ CSSModule.prototype.toString = function toString() {
   var css = '';
 
   var currentModule;
-  var currentMetadata;
 
   function planVisit(module) { toVisit.push(module); }
 
-  while(toVisit.length) {
-    currentModule = toVisit.pop();
+  while (toVisit.length) {
+    currentModule = toVisit.pop().__css_module__;
 
-    currentMetadata = currentModule.__css_module__;
+    if (visited[currentModule.id]) continue;
 
-    if (visited[currentMetadata.id]) continue;
+    reverseEach(currentModule.imports, planVisit);
 
-    reverseEach(currentMetadata.imports, planVisit);
+    visited[currentModule.id] = true;
 
-    visited[currentMetadata.id] = true;
-
-    css = currentMetadata.rawCSS + css;
+    css = currentModule.rawCSS + css;
   }
 
   return css;

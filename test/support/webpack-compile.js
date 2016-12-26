@@ -8,7 +8,7 @@ function getModules(assets) {
   const modules = {};
 
   for ( let file in assets ) {
-    modules[file] = requireFromString(assets[file].source());
+    modules[file] = requireFromString(assets[file].source().toString());
   }
 
   return modules;

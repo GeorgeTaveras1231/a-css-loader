@@ -10,7 +10,7 @@ const genericNames = require('generic-names');
 const extend = require('extend');
 
 const { createImportedName } = require('./src/import-db');
-const { cssModulesParser, isSymbolsMessage } = require('./src/css-modules-parser-postcss');
+const { cssModulesParser, urlReplacer, isSymbolsMessage } = require('./src/css-modules-parser-postcss');
 const toJS = require('./src/to-js');
 
 const LOADER_NAME = 'a-css-loader';
@@ -31,8 +31,9 @@ module.exports = function (source) {
 
   postcss([
     localByDefault({ mode }),
-    extractImports({ createImportedName }),
-    modulesValues({ createImportedName }),
+    extractImports({ createImportedName: createImportedName(['locals']) }),
+    urlReplacer({ createImportedName: createImportedName() }),
+    modulesValues({ createImportedName: createImportedName(['locals']) }),
     modulesScope({ generateScopedName: genericNames(generateScopedName) }),
     cssModulesParser()
   ])

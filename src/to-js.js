@@ -1,5 +1,6 @@
 const loaderUtils = require('loader-utils');
 const importDB = require('./import-db');
+const utils = require('./utils');
 
 const stringify = JSON.stringify;
 
@@ -10,7 +11,7 @@ function processedExports (exportedSymbols) {
     }
 
     if (symbol.type === 'imported-item') {
-      return `[require(${stringify(symbol.path)}), ${stringify(symbol.name)}]`;
+      return `[require(${stringify(symbol.path)}), ${stringify(utils.last(symbol.name))}]`;
     }
   }).join(',');
 }
@@ -38,8 +39,9 @@ module.exports = function toJS (css, imports, exports, loader) {
 
   const processedCSS = stringify(css).replace(/%__imported_item__\d+__%/g, function (match) {
     const i = importDB.get(match);
+    const parsedNamespace = i.name.reduce((accum, name) => accum + `[${stringify(name)}]`, '');
 
-    return `" + require(${stringify(i.path)}).locals[${stringify(i.name)}] + "`;
+    return `" + require(${stringify(i.path)})${parsedNamespace} + "`;
   });
 
   return `

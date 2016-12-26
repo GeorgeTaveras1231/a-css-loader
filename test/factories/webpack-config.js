@@ -18,12 +18,17 @@ module.exports = function ({ query = {}, entry = './main.css', context = '', fil
           query,
           test: /\.css$/,
           loader: 'a-css-loader'
+        },
+        {
+          test: /\.jpg$/,
+          loader: 'file-loader?name=generated-by-webpack-[hash:6].[ext]&emitFile=false'
         }
       ],
     },
     resolveLoader: {
       modulesDirectories: [
-        path.resolve(__dirname, '..', '..', '..')
+        path.resolve(__dirname, '..', '..', '..'),
+        'node_modules'
       ]
     }
   };

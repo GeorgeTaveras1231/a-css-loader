@@ -1,3 +1,5 @@
+const utils = require('./utils');
+
 const db = [];
 
 /**
@@ -17,11 +19,21 @@ exports.get = function get(key) {
  * metadata about the created import.
  */
 let index = 0;
-exports.createImportedName = function createImportedName (importedName, path) {
-  const currentIndex = index++;
-  const key = `%__imported_item__${currentIndex}__%`;
-  db[currentIndex] = { type: 'imported-item', path, name: importedName };
+exports.createImportedName = function (namespace) {
+  namespace = namespace || [];
 
-  return key;
+  return function (importedName, path) {
+    const currentIndex = index++;
+    const key = `%__imported_item__${currentIndex}__%`;
+
+    db[currentIndex] = {
+      path,
+      type: 'imported-item',
+      name: utils.compact(namespace.concat(importedName))
+    };
+
+    return key;
+  }
 }
+
 
