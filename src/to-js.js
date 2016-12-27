@@ -34,23 +34,30 @@ function importsToJS(imports) {
   return `[\n${requires.join(',\n')}\n]`;
 }
 
-module.exports = function toJS (css, imports, exports, loader) {
-  const safeCSSModulePath = loaderUtils.stringifyRequest(loader, require.resolve('./_css-module.js')) ;
+function createNamespaceAccessorsReducer(accum, name) {
+  return accum + `[${stringify(name)}]`;
+}
 
-  const processedCSS = stringify(css).replace(/%__imported_item__\d+__%/g, function (match) {
+function processCSS(css) {
+  return stringify(css).replace(/%__imported_item__\d+__%/g, function (match) {
     const i = importDB.get(match);
-    const parsedNamespace = i.name.reduce((accum, name) => accum + `[${stringify(name)}]`, '');
+    const parsedNamespace = i.name.reduce(createNamespaceAccessorsReducer,
+      `require(${stringify(i.path)})`);
 
-    return `" + require(${stringify(i.path)})${parsedNamespace} + "`;
+    return `" + ${parsedNamespace} + "`;
   });
+}
+
+module.exports = function toJS (css, imports, exports, loader, options) {
+  const safeCSSModulePath = loaderUtils.stringifyRequest(loader, require.resolve('./_css-module.js'));
 
   return `
 var CSSModule = require(${safeCSSModulePath}).CSSModule;
 
 exports.default = new CSSModule(
-${processedCSS},
+${options.embedCss ? processCSS(css) : '""'},
 ${exportsToJS(exports)},
-${importsToJS(imports)}
+${options.embedCss ? importsToJS(imports) : '[]'}
 );
 
 module.exports = exports.default;`;

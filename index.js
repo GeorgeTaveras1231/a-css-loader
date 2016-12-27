@@ -16,14 +16,14 @@ const toJS = require('./src/to-js');
 const LOADER_NAME = 'a-css-loader';
 const DEFAULT_OPTIONS = Object.freeze({
   mode: 'pure',
-  generateScopedName: '[local]--[hash:5]'
+  generateScopedName: '[local]--[hash:5]',
+  embedCss: true
 });
 
 module.exports = function (source) {
-  const {
-    mode,
-    generateScopedName
-  } = extend({}, DEFAULT_OPTIONS, loaderUtils.getLoaderConfig(this, LOADER_NAME));
+  const options = extend({}, DEFAULT_OPTIONS, loaderUtils.getLoaderConfig(this, LOADER_NAME));
+
+  const { mode, generateScopedName } = options;
 
   const callback = this.async();
 
@@ -41,7 +41,7 @@ module.exports = function (source) {
   .then(({ css, messages }) => {
     const {imports, exports} = messages.find(isSymbolsMessage);
 
-    callback(null, toJS(css, imports, exports, this));
+    callback(null, toJS(css, imports, exports, this, options));
   })
   .catch((err) => {
     callback(err);

@@ -9,17 +9,16 @@ exports.isSymbolsMessage = function isSymbolsMessage(message) {
   return message.plugin === 'css-modules-parser' && message.type === 'symbols';
 };
 
-exports.urlReplacer = postcss.plugin('url-replacer', function ({ createImportedName }) {
-  return function (css) {
+exports.urlReplacer = postcss.plugin('url-replacer', ({ createImportedName }) => {
+  return (css) => {
     const imports = new Set;
 
-    css.walkRules(function (rule) {
-
-      rule.walkDecls(function (declaration) {
-        declaration.value = declaration.value.replace(/url\((['"]?)~(.+)\1\)/g, function (_, quote, url) {
+    css.walkRules((rule) => {
+      rule.walkDecls((declaration) => {
+        declaration.value = declaration.value.replace(/url\((['"]?)~(.+)\1\)/g, (_whole, _quote, url) => {
           const alias = createImportedName(null, url);
 
-          imports.add({ alias, url, importedKey: 'default' });
+          imports.add({ alias, url });
 
           return `url('${alias}')`;
         });
@@ -28,24 +27,24 @@ exports.urlReplacer = postcss.plugin('url-replacer', function ({ createImportedN
 
     for ( let i of imports ) {
       const rule = postcss.rule({ selector: `:import(${i.url})` });
-      rule.append(postcss.decl({ prop: i.alias, value: i.importedKey }));
+      rule.append(postcss.decl({ prop: i.alias, value: '' }));
 
       css.prepend(rule);
     }
   }
 });
 
-exports.cssModulesParser = postcss.plugin('css-modules-parser', function parserPlugin() {
-  return function (css, result) {
+exports.cssModulesParser = postcss.plugin('css-modules-parser', () => {
+  return (css, result) => {
     const imports = new Imports;
     const exports = new Exports;
 
-    css.walkAtRules('import', function (rule) {
+    css.walkAtRules('import', (rule) => {
       imports.addUrl(cleanImportUrl(rule.params));
       rule.remove();
     });
 
-    css.walkRules(function (rule) {
+    css.walkRules((rule) => {
       if (/:import\(.+\)/.test(rule.selector)) {
         imports.addFromImportedSymbols(rule);
         rule.remove();

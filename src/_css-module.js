@@ -13,8 +13,10 @@ function eachClassName(module, localName, cb) {
 
   if (typeof module.get === 'function') {
     importedModules = module.get(localName);
-  } else {
+  } else if (typeof module.locals === 'object') {
     importedModules = module.locals[localName];
+  } else {
+    importedModules = module[localName];
   }
 
   importedModules.split(' ').forEach(cb);
