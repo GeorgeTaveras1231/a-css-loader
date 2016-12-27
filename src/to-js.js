@@ -50,14 +50,16 @@ function processCSS(css) {
 
 module.exports = function toJS (css, imports, exports, loader, options) {
   const safeCSSModulePath = loaderUtils.stringifyRequest(loader, require.resolve('./_css-module.js'));
+  const moduleName = loaderUtils.interpolateName(loader, '[hash:5]/[name]', { content: css });
 
   return `
-var CSSModule = require(${safeCSSModulePath}).CSSModule;
+var builder = require(${safeCSSModulePath}).cssModuleBuilder;
 
-exports.default = new CSSModule(
-${options.embedCss ? processCSS(css) : '""'},
+exports.default = builder(
+${stringify(moduleName)},
+${processCSS(css)},
 ${exportsToJS(exports)},
-${options.embedCss ? importsToJS(imports) : '[]'}
+${importsToJS(imports)}
 );
 
 module.exports = exports.default;`;

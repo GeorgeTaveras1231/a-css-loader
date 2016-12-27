@@ -1,1 +1,1 @@
-const css = require('./application.css');
+module.exports = require('./application.css');
