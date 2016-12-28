@@ -16,10 +16,12 @@ function processedExports (exportedSymbols) {
   }).join(',');
 }
 
-function exportsToJS(exports) {
+function exportsToJS(exports, transformKey = $1 => $1, transformArgs = []) {
   var localDefinitions = []
   for (let symbol of exports) {
-    localDefinitions.push(`\t${stringify(symbol.name)}: [${processedExports(symbol.value)}]`);
+    const key = transformKey(symbol.name, ...transformArgs);
+
+    localDefinitions.push(`\t${stringify(key)}: [${processedExports(symbol.value)}]`);
   }
 
   return `{\n${localDefinitions.join(',\n')}}`;
@@ -48,6 +50,14 @@ function processCSS(css) {
   });
 }
 
+function properCase(key, { exportStyle }) {
+  if (exportStyle === 'camelized') {
+    return key.replace(/\W(\w)/g, (_, $2) => $2.toUpperCase());
+  }
+
+  return key;
+}
+
 module.exports = function toJS (css, imports, exports, loader, options) {
   const safeCSSModulePath = loaderUtils.stringifyRequest(loader, require.resolve('./_css-module.js'));
   const moduleID = loaderUtils.getHashDigest(css, 'md5', 'hex');
@@ -58,7 +68,7 @@ var builder = require(${safeCSSModulePath}).cssModuleBuilder;
 exports.default = builder(
 ${stringify(moduleID)},
 ${processCSS(css)},
-${exportsToJS(exports)},
+${exportsToJS(exports, properCase, [options])},
 ${importsToJS(imports)}
 );
 

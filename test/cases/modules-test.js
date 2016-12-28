@@ -6,18 +6,19 @@ const configFactory = require('../factories/webpack-config');
 const webpackCompile = require('../support/webpack-compile');
 const setup = require('../support/test-setup');
 
-const webpackConfig = configFactory({
-  context: 'modules-test',
-  query: {
-    generateScopedName: 'modules-test__[local]',
-    mode: 'global'
-  },
-});
 
 describe('build', () => {
-  before(setup(webpackConfig));
-
   describe('modules', function () {
+    const webpackConfig = configFactory({
+      context: 'modules-test',
+      query: {
+        generateScopedName: 'modules-test__[local]',
+        mode: 'global'
+      },
+    });
+
+    before(setup(webpackConfig));
+
     it('exports module locals', function () {
       assertIncludesClassPattern(this.cssModule.get('local'), /^modules-test__local$/);
     });
@@ -42,24 +43,46 @@ describe('build', () => {
 
       assert.equal(value, 'true');
     });
-  });
 
-  describe('css', function () {
-    before(function () {
-      this.css = this.cssModule.toString();
-      this.parsedCSS = css.parse(this.css);
-    });
-
-    it('removes @imports', function () {
-      assert.ok(this.css.indexOf('@import') === -1);
-    });
-
-    it('includes the css from js module', function () {
-      const ruleFromJs = this.parsedCSS.stylesheet.rules.find((rule) => {
-        return rule.selectors.find((selector) => selector === '.simple-module');
+    describe('css', function () {
+      before(function () {
+        this.css = this.cssModule.toString();
+        this.parsedCSS = css.parse(this.css);
       });
 
-      assert(ruleFromJs);
+      it('removes @imports', function () {
+        assert.ok(this.css.indexOf('@import') === -1);
+      });
+
+      it('includes the css from js module', function () {
+        const ruleFromJs = this.parsedCSS.stylesheet.rules.find((rule) => {
+          return rule.selectors.find($1 => $1 === '.simple-module');
+        });
+
+        assert(ruleFromJs);
+      });
+    });
+  });
+
+  describe('different export styles', function () {
+    const webpackConfig = configFactory({
+      context: 'modules-test',
+      query: {
+        generateScopedName: 'modules-test__[local]',
+        mode: 'global',
+        exportStyle: 'camelized'
+      },
+    });
+
+    before(setup(webpackConfig));
+
+
+    describe('camelized', function () {
+      it('provides camelCase variables', function () {
+        const value = this.cssModule.get('exportedValue');
+
+        assert.equal(value, 'true');
+      });
     });
   });
 });
