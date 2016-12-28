@@ -1,0 +1,11 @@
+.a {
+  composes: a from 'dep-a';
+
+  font-size: 10px;
+}
+
+.b {
+  composes: b from 'dep-b';
+
+  font-size: 10px;
+}

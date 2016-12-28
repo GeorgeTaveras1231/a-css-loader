@@ -1,10 +1,11 @@
 const path = require('path');
+const OptimizeCSSAssets = require('optimize-css-assets-webpack-plugin');
 const ExtractText = require('extract-text-webpack-plugin');
 
-const css = new ExtractText('application.css');
+const extractCSS = new ExtractText('application.css');
 
 module.exports = {
-  entry: './application.js',
+  entry: './application.css',
   context: __dirname,
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -15,16 +16,13 @@ module.exports = {
     loaders: [
       {
         test: /\.css$/,
-        loader: css.loader('&remove=true!a-css-loader?'),
-      },
-      {
-        test: /\.jpg$/,
-        loader: 'file-loader'
+        loader: extractCSS.loader('!a-css-loader?'),
       }
     ],
   },
   plugins: [
-    css
+    extractCSS,
+    new OptimizeCSSAssets(),
   ],
   resolveLoader: {
     modulesDirectories: [

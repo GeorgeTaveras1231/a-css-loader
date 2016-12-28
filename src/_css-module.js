@@ -1,13 +1,7 @@
 var hasOwnProperty = Object.prototype.hasOwnProperty;
-var freeze = Object.freeze;
 var stringify = JSON.stringify;
 
 var CSSModulePrototype = Object.create(Array.prototype, {
-  get: {
-    value: function (name) {
-      return getLocal(this.locals, name);
-    }
-  },
   toString: {
     value: function toString() {
       var visited = {};
@@ -46,9 +40,9 @@ function eachClassName(module, localName, cb) {
   var importedModules;
 
   if (typeof module.locals === 'object') {
-    importedModules = getLocal(module.locals, localName);
+    importedModules = module.locals[localName];
   } else {
-    importedModules = getLocal(module, localName);
+    importedModules = module[localName];
   }
 
   (importedModules || '').split(' ').forEach(cb);
@@ -131,14 +125,5 @@ function cssModuleBuilder(moduleId, css, locals, imports) {
 
   return module;
 }
-
-
-function getLocal(module, key) {
-  if (!module[key]) {
-    throw new Error('local named ' + stringify(key) + ' is not defined in \n' + stringify(module, null, 2));
-  }
-
-  return module[key];
-};
 
 exports.cssModuleBuilder = cssModuleBuilder;

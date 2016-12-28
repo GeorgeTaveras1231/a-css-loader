@@ -3,7 +3,24 @@ const extend = require('extend');
 
 const fixturesPath = path.resolve.bind(null, __dirname, '..', 'fixtures');
 
-module.exports = ({ query = {}, entry = './main.css', context = '', filename = 'result' }) => {
+module.exports = ({
+  query = {},
+  entry = './main.css',
+  context = '',
+  filename = 'result',
+  loaders = [
+    {
+      query,
+      test: /\.css$/,
+      loader: 'a-css-loader'
+    },
+    {
+      test: /\.jpg$/,
+      loader: 'file-loader?name=generated-by-webpack-[hash:6].[ext]&emitFile=false'
+    }
+  ],
+  plugins = []
+}) => {
   return {
     context: fixturesPath(context),
     entry: entry,
@@ -12,19 +29,8 @@ module.exports = ({ query = {}, entry = './main.css', context = '', filename = '
       filename: `${filename}.js`,
       libraryTarget: 'umd'
     },
-    module: {
-      loaders: [
-        {
-          query,
-          test: /\.css$/,
-          loader: 'a-css-loader'
-        },
-        {
-          test: /\.jpg$/,
-          loader: 'file-loader?name=generated-by-webpack-[hash:6].[ext]&emitFile=false'
-        }
-      ],
-    },
+    plugins,
+    module: { loaders },
     resolveLoader: {
       modulesDirectories: [
         path.resolve(__dirname, '..', '..', '..'),

@@ -4,16 +4,6 @@ const MemoryFs = require('memory-fs');
 
 const mfs = new MemoryFs;
 
-function getModules(assets) {
-  const modules = {};
-
-  for ( let file in assets ) {
-    modules[file] = requireFromString(assets[file].source().toString());
-  }
-
-  return modules;
-}
-
 module.exports = function (webpackConfig) {
   const compiler = webpack(webpackConfig);
 
@@ -29,7 +19,7 @@ module.exports = function (webpackConfig) {
         if ( compilation.errors.length > 0 ) {
           reject(compilation.errors)
         } else {
-          resolve(getModules(compilation.assets));
+          resolve(compilation.assets);
         }
       }
     });

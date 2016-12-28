@@ -1,0 +1,12 @@
+.a {
+  color: red;
+}
+
+.a {
+  background-color: red;
+}
+
+.b {
+  composes: a;
+  background-color: red;
+}

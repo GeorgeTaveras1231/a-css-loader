@@ -1,31 +1,25 @@
 const path = require('path');
-const ExtractText = require('extract-text-webpack-plugin');
-
-const css = new ExtractText('application.css');
+const HTMLPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './application.js',
+  entry: './application.css',
   context: __dirname,
   output: {
     path: path.resolve(__dirname, 'build'),
     filename: `application.js`,
     libraryTarget: 'umd'
   },
+  plugins: [
+    new HTMLPlugin()
+  ],
   module: {
     loaders: [
       {
         test: /\.css$/,
-        loader: css.loader('&remove=true!a-css-loader?'),
-      },
-      {
-        test: /\.jpg$/,
-        loader: 'file-loader'
+        loaders: ['style', 'a-css-loader'],
       }
     ],
   },
-  plugins: [
-    css
-  ],
   resolveLoader: {
     modulesDirectories: [
       path.resolve(__dirname, '..', '..', '..'),
