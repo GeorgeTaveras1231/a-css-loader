@@ -50,13 +50,13 @@ function processCSS(css) {
 
 module.exports = function toJS (css, imports, exports, loader, options) {
   const safeCSSModulePath = loaderUtils.stringifyRequest(loader, require.resolve('./_css-module.js'));
-  const moduleName = loaderUtils.interpolateName(loader, '[hash:5]/[name]', { content: css });
+  const moduleID = loaderUtils.getHashDigest(css, 'md5', 'hex');
 
   return `
 var builder = require(${safeCSSModulePath}).cssModuleBuilder;
 
 exports.default = builder(
-${stringify(moduleName)},
+${stringify(moduleID)},
 ${processCSS(css)},
 ${exportsToJS(exports)},
 ${importsToJS(imports)}

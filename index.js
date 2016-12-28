@@ -16,8 +16,7 @@ const toJS = require('./src/to-js');
 const LOADER_NAME = 'a-css-loader';
 const DEFAULT_OPTIONS = Object.freeze({
   mode: 'pure',
-  generateScopedName: '[local]--[hash:5]',
-  embedCss: true
+  generateScopedName: '[local]--[hash:5]'
 });
 
 module.exports = function (source) {

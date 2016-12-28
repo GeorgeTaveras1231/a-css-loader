@@ -3,7 +3,11 @@ var freeze = Object.freeze;
 var stringify = JSON.stringify;
 
 var CSSModulePrototype = Object.create(Array.prototype, {
-  get: { value: getLocal },
+  get: {
+    value: function (name) {
+      return getLocal(this.locals, name);
+    }
+  },
   toString: {
     value: function toString() {
       var visited = {};
@@ -42,9 +46,9 @@ function eachClassName(module, localName, cb) {
   var importedModules;
 
   if (typeof module.locals === 'object') {
-    importedModules = getLocal.call(module, localName);
+    importedModules = getLocal(module.locals, localName);
   } else {
-    importedModules = module[localName];
+    importedModules = getLocal(module, localName);
   }
 
   (importedModules || '').split(' ').forEach(cb);
@@ -104,17 +108,17 @@ function processImports(parentModule, imports) {
   });
 }
 
-function cssModuleBuilder(moduleName, css, locals, imports) {
+function cssModuleBuilder(moduleId, css, locals, imports) {
   var module = [];
 
   /* Change the prototype of array to add method overrides that are not 'own keys' */
-  /* This is kinda strange I know; I tried making a separate constructor that inherits from
+  /* This is kinda strange I know. I tried making a separate constructor that inherits from
    * The Array.prototype but the ExtractTextPlugin depends on the modules being native arrays.
    **/
   module.__proto__ = CSSModulePrototype;
 
   module.push([
-    moduleName,
+    moduleId,
     css,
     null
   ]);
@@ -129,12 +133,12 @@ function cssModuleBuilder(moduleName, css, locals, imports) {
 }
 
 
-function getLocal(key) {
-  if (!this.locals[key]) {
-    throw new Error('local named ' + stringify(key) + ' is not defined');
+function getLocal(module, key) {
+  if (!module[key]) {
+    throw new Error('local named ' + stringify(key) + ' is not defined in \n' + stringify(module, null, 2));
   }
 
-  return this.locals[key];
+  return module[key];
 };
 
 exports.cssModuleBuilder = cssModuleBuilder;
