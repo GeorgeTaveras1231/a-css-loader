@@ -1,4 +1,4 @@
-const { Imports, Exports } = require('./rule-lists');
+const { Imports, Exports } = require('./collectors');
 const postcss = require('postcss');
 
 function cleanImportUrl(url) {
