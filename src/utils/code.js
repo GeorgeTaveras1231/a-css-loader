@@ -4,27 +4,27 @@ exports.jsRequire = function jsRequire(path) {
   return `require(${stringify(path)})`;
 };
 
-exports.jsArrayFromList = function jsArrayFromList(list, callback = $1 => $1, callbackArgs = []) {
-  let js = '[ ';
+exports.jsArrayFromList = function jsArrayFromList(list, mapper = $1 => $1, callbackArgs = []) {
+  let js = '';
 
   for(const value of list)  {
-    js += callback(value, ...callbackArgs);
-    js += ','
+    js += mapper(value, ...callbackArgs);
+    js += ', '
   }
 
-  return js.slice(0, -1) + ']';
+  return '[' + js.slice(0, -2) + ']';
 }
 
-exports.jsObjectFromList = function jsObjectFromList(list, callback = $1 => $1, callbackArgs = []) {
-  let js = '{ ';
+exports.jsObjectFromList = function jsObjectFromList(list, mapper = $1 => $1, callbackArgs = []) {
+  let js = '';
 
   for(const item of list)  {
-    const [key, value] = callback(item, ...callbackArgs);
+    const [key, value] = mapper(item, ...callbackArgs);
     js += stringify(key);
     js += ': '
     js += value;
-    js += ','
+    js += ', '
   }
 
-  return js.slice(0, -1) + '}';
+  return '{' + js.slice(0, -2) + '}';
 }

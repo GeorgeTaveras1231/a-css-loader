@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "config": {
-    "test-files": "test/cases/*-test.js"
+    "test-files": "test/cases/*-test.js test/units/*-test.js"
   },
   "scripts": {
     "test": "mocha $npm_package_config_test_files"
@@ -24,7 +24,8 @@
     "postcss-modules-extract-imports": "^1.0.1",
     "postcss-modules-local-by-default": "^1.1.1",
     "postcss-modules-scope": "^1.0.2",
-    "postcss-modules-values": "^1.2.2"
+    "postcss-modules-values": "^1.2.2",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {
     "css": "^2.2.1",

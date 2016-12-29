@@ -1,6 +1,7 @@
+const { compact } = require('underscore');
 const loaderUtils = require('loader-utils');
-const importDB = require('./import-db');
-const { compact } = require('./utils');
+
+const { IMPORTED_SYMBOL_PATTERN } = importDB = require('./import-db');
 const {
   jsRequire,
   jsArrayFromList,
@@ -31,7 +32,7 @@ function *generateKeyValuePairs(exports, createKeyVariations = $1 => [$1], creat
   }
 }
 
-function *generateVariableVariations(key, { camelize }) {
+function *generateKeyVariations(key, { camelize }) {
   yield key;
 
   if (camelize === true) {
@@ -40,7 +41,7 @@ function *generateVariableVariations(key, { camelize }) {
 }
 
 function createLocalsJS(exports, options) {
-  const keyValuePairs = generateKeyValuePairs(exports, generateVariableVariations, [options]);
+  const keyValuePairs = generateKeyValuePairs(exports, generateKeyVariations, [options]);
 
   return jsObjectFromList(keyValuePairs, ([key, value]) => [key, createLocalValueJS(value)]);
 }
@@ -50,11 +51,10 @@ function createNamespaceAccessorsReducer(accum, name) {
 }
 
 function processCSS(css) {
-  return stringify(css).replace(/%__imported_item__\d+__%/g, function (match) {
-    const { namespace, path, name } = importDB.get(match);
-    const parsedNamespace = compact(namespace.concat(name)).reduce(createNamespaceAccessorsReducer, jsRequire(path));
+  return stringify(css).replace(IMPORTED_SYMBOL_PATTERN, function (match) {
+    const importRecord = importDB.get(match);
 
-    return `" + ${parsedNamespace} + "`;
+    return `" + ${importRecord.toJS()} + "`;
   });
 }
 
@@ -63,14 +63,11 @@ module.exports = function toJS (css, imports, exports, loader, options) {
   const moduleID = loaderUtils.getHashDigest(css, 'md5', 'hex');
 
   return `
-var builder = require(${safeCSSModulePath}).cssModuleBuilder;
+var builder = require(${safeCSSModulePath});
+var cssModule = builder.initialize(${stringify(moduleID)}, ${processCSS(css)});
 
-exports.default = builder(
-${stringify(moduleID)},
-${processCSS(css)},
-${createLocalsJS(exports, options)},
-${jsArrayFromList(imports, jsRequire)}
-);
+cssModule.requireAll(${jsArrayFromList(imports, jsRequire)});
+cssModule.defineLocals(${createLocalsJS(exports, options)});
 
-module.exports = exports.default;`;
+module.exports = exports.default = cssModule;`;
 };
