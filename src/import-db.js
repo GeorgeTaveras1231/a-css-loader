@@ -28,8 +28,9 @@ exports.createImportedName = function (namespace) {
 
     db[currentIndex] = {
       path,
+      namespace,
       type: 'imported-item',
-      name: utils.compact(namespace.concat(importedName))
+      name: importedName
     };
 
     return key;

@@ -70,7 +70,7 @@ describe('build', () => {
       query: {
         generateScopedName: 'modules-test__[local]',
         mode: 'global',
-        exportStyle: 'camelized'
+        camelize: true
       },
     });
 

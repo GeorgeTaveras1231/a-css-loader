@@ -17,7 +17,7 @@ const LOADER_NAME = 'a-css-loader';
 const DEFAULT_OPTIONS = Object.freeze({
   mode: 'pure',
   generateScopedName: '[local]--[hash:5]',
-  exportStyle: 'dasherized'
+  camelize: false
 });
 
 module.exports = function (source) {

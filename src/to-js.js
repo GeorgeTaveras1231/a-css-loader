@@ -1,39 +1,48 @@
 const loaderUtils = require('loader-utils');
 const importDB = require('./import-db');
-const utils = require('./utils');
+const { compact } = require('./utils');
+const {
+  jsRequire,
+  jsArrayFromList,
+  jsObjectFromList
+} = require('./utils/code');
 
 const stringify = JSON.stringify;
 
-function processedExports (exportedSymbols) {
-  return exportedSymbols.map((symbol) => {
-    if (symbol.type === 'local') {
-      return stringify(symbol.name);
+function createLocalValueJS (exportedSymbols) {
+  return jsArrayFromList(exportedSymbols, ({name, type, path}) => {
+    if (type === 'local') {
+      return stringify(name);
     }
 
-    if (symbol.type === 'imported-item') {
-      return `[require(${stringify(symbol.path)}), ${stringify(utils.last(symbol.name))}]`;
+    if (type === 'imported-item') {
+      return jsArrayFromList([jsRequire(path), stringify(name)]);
     }
-  }).join(',');
+  });
 }
 
-function exportsToJS(exports, transformKey = $1 => $1, transformArgs = []) {
-  var localDefinitions = []
-  for (let symbol of exports) {
-    const key = transformKey(symbol.name, ...transformArgs);
+function *generateKeyValuePairs(exports, createKeyVariations = $1 => [$1], createKeyVariationsArgs = []) {
+  for (const { name, value } of exports) {
+    const keys = createKeyVariations(name, ...createKeyVariationsArgs);
 
-    localDefinitions.push(`\t${stringify(key)}: [${processedExports(symbol.value)}]`);
+    for (const key of keys) {
+      yield [key, value];
+    }
   }
-
-  return `{\n${localDefinitions.join(',\n')}}`;
 }
 
-function importsToJS(imports) {
-  const requires = [];
-  for (let url of imports) {
-    requires.push(`\trequire(${stringify(url)})`);
-  }
+function *generateVariableVariations(key, { camelize }) {
+  yield key;
 
-  return `[\n${requires.join(',\n')}\n]`;
+  if (camelize === true) {
+    yield key.replace(/\W(\w)/g, (_, $2) => $2.toUpperCase());
+  }
+}
+
+function createLocalsJS(exports, options) {
+  const keyValuePairs = generateKeyValuePairs(exports, generateVariableVariations, [options]);
+
+  return jsObjectFromList(keyValuePairs, ([key, value]) => [key, createLocalValueJS(value)]);
 }
 
 function createNamespaceAccessorsReducer(accum, name) {
@@ -42,20 +51,11 @@ function createNamespaceAccessorsReducer(accum, name) {
 
 function processCSS(css) {
   return stringify(css).replace(/%__imported_item__\d+__%/g, function (match) {
-    const i = importDB.get(match);
-    const parsedNamespace = i.name.reduce(createNamespaceAccessorsReducer,
-      `require(${stringify(i.path)})`);
+    const { namespace, path, name } = importDB.get(match);
+    const parsedNamespace = compact(namespace.concat(name)).reduce(createNamespaceAccessorsReducer, jsRequire(path));
 
     return `" + ${parsedNamespace} + "`;
   });
-}
-
-function properCase(key, { exportStyle }) {
-  if (exportStyle === 'camelized') {
-    return key.replace(/\W(\w)/g, (_, $2) => $2.toUpperCase());
-  }
-
-  return key;
 }
 
 module.exports = function toJS (css, imports, exports, loader, options) {
@@ -68,8 +68,8 @@ var builder = require(${safeCSSModulePath}).cssModuleBuilder;
 exports.default = builder(
 ${stringify(moduleID)},
 ${processCSS(css)},
-${exportsToJS(exports, properCase, [options])},
-${importsToJS(imports)}
+${createLocalsJS(exports, options)},
+${jsArrayFromList(imports, jsRequire)}
 );
 
 module.exports = exports.default;`;
