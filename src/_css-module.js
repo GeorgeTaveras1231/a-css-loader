@@ -1,3 +1,5 @@
+'use strict';
+
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var stringify = JSON.stringify;
 

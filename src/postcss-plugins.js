@@ -1,13 +1,8 @@
-const { Imports, Exports } = require('./collectors');
 const postcss = require('postcss');
 
 function cleanImportUrl(url) {
   return url.replace(/^(['"])(.+)\1$/g, '$2');
 }
-
-exports.isSymbolsMessage = function isSymbolsMessage(message) {
-  return message.plugin === 'css-modules-parser' && message.type === 'symbols';
-};
 
 exports.urlReplacer = postcss.plugin('url-replacer', ({ createImportedName }) => {
   return (css) => {
@@ -34,34 +29,25 @@ exports.urlReplacer = postcss.plugin('url-replacer', ({ createImportedName }) =>
   }
 });
 
-exports.cssModulesParser = postcss.plugin('css-modules-parser', () => {
-  return (css, result) => {
-    const imports = new Imports;
-    const exports = new Exports;
-
+exports.cssModulesFinalSweeper = postcss.plugin('css-modules-final-sweeper', ({ symbolsCollector }) => {
+  return (css) => {
     css.walkAtRules('import', (rule) => {
-      imports.addUrl(cleanImportUrl(rule.params));
+      symbolsCollector.addUrl(cleanImportUrl(rule.params));
       rule.remove();
     });
 
     css.walkRules((rule) => {
       if (/:import\(.+\)/.test(rule.selector)) {
-        imports.addFromImportedSymbols(rule);
         rule.remove();
       }
-
 
       if (rule.selector === ':export') {
-        exports.addFromExportedSymbols(rule);
+        rule.walkDecls((declaration) => {
+           symbolsCollector.addExportItem({ name: declaration.prop, values: declaration.value });
+        });
+
         rule.remove();
       }
-    });
-
-    result.messages.push({
-      type: 'symbols',
-      plugin: 'css-modules-parser',
-      imports: imports,
-      exports: exports
     });
   }
 });

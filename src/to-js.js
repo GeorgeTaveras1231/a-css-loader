@@ -1,7 +1,10 @@
+'use strict';
+
 const { compact } = require('underscore');
 const loaderUtils = require('loader-utils');
 
-const { IMPORTED_SYMBOL_PATTERN } = importDB = require('./import-db');
+const { IMPORTED_SYMBOL_PATTERN } = require('./symbols-collector');;
+
 const {
   jsRequire,
   jsArrayFromList,
@@ -50,7 +53,7 @@ function createNamespaceAccessorsReducer(accum, name) {
   return accum + `[${stringify(name)}]`;
 }
 
-function processCSS(css) {
+function processCSS(css, importDB) {
   return stringify(css).replace(IMPORTED_SYMBOL_PATTERN, function (match) {
     const importRecord = importDB.get(match);
 
@@ -58,16 +61,16 @@ function processCSS(css) {
   });
 }
 
-module.exports = function toJS (css, imports, exports, loader, options) {
+module.exports = function toJS (css, loader, options, importDB) {
   const safeCSSModulePath = loaderUtils.stringifyRequest(loader, require.resolve('./_css-module.js'));
   const moduleID = loaderUtils.getHashDigest(css, 'md5', 'hex');
 
   return `
 var builder = require(${safeCSSModulePath});
-var cssModule = builder.initialize(${stringify(moduleID)}, ${processCSS(css)});
+var cssModule = builder.initialize(${stringify(moduleID)}, ${processCSS(css, importDB)});
 
-cssModule.requireAll(${jsArrayFromList(imports, jsRequire)});
-cssModule.defineLocals(${createLocalsJS(exports, options)});
+cssModule.requireAll(${jsArrayFromList(importDB.urls(), jsRequire)});
+cssModule.defineLocals(${createLocalsJS(importDB.exports(), options)});
 
 module.exports = exports.default = cssModule;`;
 };

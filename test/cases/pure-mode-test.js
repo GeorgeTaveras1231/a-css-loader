@@ -8,7 +8,7 @@ const setup = require('../support/test-setup');
 const webpackConfig = configFactory({
   context: 'pure-mode-test',
   query: {
-    generateScopedName: 'pure__[local]',
+    scopedNameFormat: 'pure__[local]',
     mode: 'pure'
   }
 });

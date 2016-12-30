@@ -12,7 +12,7 @@ describe('build', () => {
     const webpackConfig = configFactory({
       context: 'modules-test',
       query: {
-        generateScopedName: 'modules-test__[local]',
+        scopedNameFormat: 'modules-test__[local]',
         mode: 'global'
       },
     });
@@ -68,7 +68,6 @@ describe('build', () => {
     const webpackConfig = configFactory({
       context: 'modules-test',
       query: {
-        generateScopedName: 'modules-test__[local]',
         mode: 'global',
         camelize: true
       },

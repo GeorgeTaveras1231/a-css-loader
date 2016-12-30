@@ -9,41 +9,40 @@ const loaderUtils = require('loader-utils');
 const genericNames = require('generic-names');
 const extend = require('extend');
 
-const { createImportedName } = require('./src/import-db');
-const { cssModulesParser, urlReplacer, isSymbolsMessage } = require('./src/css-modules-parser-postcss');
+const { SymbolsCollector } = require('./src/symbols-collector');
+const { cssModulesFinalSweeper, urlReplacer } = require('./src/postcss-plugins');
 const toJS = require('./src/to-js');
 
 const LOADER_NAME = 'a-css-loader';
 const DEFAULT_OPTIONS = Object.freeze({
   mode: 'pure',
-  generateScopedName: '[local]--[hash:5]',
+  scopedNameFormat: '[local]--[hash:5]',
   camelize: false
 });
 
 module.exports = function (source) {
-  const options = extend({}, DEFAULT_OPTIONS, loaderUtils.getLoaderConfig(this, LOADER_NAME));
+  this.cacheable();
 
-  const { mode, generateScopedName } = options;
+  const options = extend({}, DEFAULT_OPTIONS, loaderUtils.getLoaderConfig(this, LOADER_NAME));
+  const symbolsCollector = new SymbolsCollector;
+
+  const { mode, scopedNameFormat } = options;
 
   const callback = this.async();
 
-  this.cacheable();
-
+  const localsAgent = symbolsCollector.createCollectorAgent(['locals']);
+  const urlsAgent = symbolsCollector.createCollectorAgent([/* no namespace for url requires */]);
   postcss([
     localByDefault({ mode }),
-    extractImports({ createImportedName: createImportedName(['locals']) }),
-    urlReplacer({ createImportedName: createImportedName() }),
-    modulesValues({ createImportedName: createImportedName(['locals']) }),
-    modulesScope({ generateScopedName: genericNames(generateScopedName) }),
-    cssModulesParser()
+    extractImports({ createImportedName: localsAgent }),
+    urlReplacer({ createImportedName: urlsAgent }),
+    modulesValues({ createImportedName: localsAgent }),
+    modulesScope({ generateScopedName: genericNames(scopedNameFormat) }),
+    cssModulesFinalSweeper({ symbolsCollector })
   ])
   .process(source)
   .then(({ css, messages }) => {
-    const {imports, exports} = messages.find(isSymbolsMessage);
-
-    callback(null, toJS(css, imports, exports, this, options));
+    callback(null, toJS(css, this, options, symbolsCollector));
   })
-  .catch((err) => {
-    callback(err);
-  })
+  .catch(callback);
 };
