@@ -5,7 +5,7 @@
 ### Rationale
 This loader is different than [webpack/css-loader](https://github.com/webpack/css-loader) in the following ways.
 
-- Allows css-modules to be distributed and re-used as npm packages. (See webpack/css-loader#393)
+- Allows css-modules to be distributed and re-used as npm packages. (See [webpack/css-loader#393](https://github.com/webpack/css-loader/pull/393))
 - Allows webpack to fully resolve all paths
 - Includes css-modules/values by default
 
