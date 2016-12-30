@@ -32,6 +32,7 @@ module.exports = function (source) {
 
   const localsAgent = symbolsCollector.createImportedItemCollectorAgent(['locals']);
   const urlsAgent = symbolsCollector.createImportedItemCollectorAgent([/* no namespace for url requires */]);
+
   postcss([
     localByDefault({ mode }),
     extractImports({ createImportedName: localsAgent }),
