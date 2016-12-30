@@ -41,8 +41,8 @@ exports.SymbolsCollector = class SymbolsCollector {
    *
    * @param key {string}
    */
-  get(key) {
-    const match = /^%__imported_item__(\d+)__%$/.exec(key);
+  getImpoertedItem(lookupKey) {
+    const match = /^%__imported_item__(\d+)__%$/.exec(lookupKey);
     return match && (this.importedSymbols[match[1]] || null);
   }
 
@@ -64,7 +64,7 @@ exports.SymbolsCollector = class SymbolsCollector {
 
   *normalizedExportedValues(values) {
     for (const value of values.split(/\s+/)) {
-      const importedItem = this.get(value);
+      const importedItem = this.getImpoertedItem(value);
 
       if (importedItem) {
         yield importedItem;

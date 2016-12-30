@@ -42,7 +42,7 @@ module.exports = function (source) {
   ])
   .process(source)
   .then(({ css, messages }) => {
-    callback(null, toJS(css, this, options, symbolsCollector));
+    callback(null, toJS(css, symbolsCollector, this, options));
   })
   .catch(callback);
 };

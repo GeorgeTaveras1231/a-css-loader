@@ -53,24 +53,24 @@ function createNamespaceAccessorsReducer(accum, name) {
   return accum + `[${stringify(name)}]`;
 }
 
-function processCSS(css, importDB) {
-  return stringify(css).replace(IMPORTED_SYMBOL_PATTERN, function (match) {
-    const importRecord = importDB.get(match);
+function processCSS(css, symbolsCollector) {
+  return stringify(css).replace(IMPORTED_SYMBOL_PATTERN, function (lookupKey) {
+    const importRecord = symbolsCollector.getImpoertedItem(lookupKey);
 
     return `" + ${importRecord.toJS()} + "`;
   });
 }
 
-module.exports = function toJS (css, loader, options, importDB) {
+module.exports = function toJS (css, symbolsCollector, loader, options) {
   const safeCSSModulePath = loaderUtils.stringifyRequest(loader, require.resolve('./_css-module.js'));
   const moduleID = loaderUtils.getHashDigest(css, 'md5', 'hex');
 
   return `
 var builder = require(${safeCSSModulePath});
-var cssModule = builder.initialize(${stringify(moduleID)}, ${processCSS(css, importDB)});
+var cssModule = builder.initialize(${stringify(moduleID)}, ${processCSS(css, symbolsCollector)});
 
-cssModule.requireAll(${jsArrayFromList(importDB.urls(), jsRequire)});
-cssModule.defineLocals(${createLocalsJS(importDB.exports(), options)});
+cssModule.requireAll(${jsArrayFromList(symbolsCollector.urls(), jsRequire)});
+cssModule.defineLocals(${createLocalsJS(symbolsCollector.exports(), options)});
 
 module.exports = exports.default = cssModule;`;
 };
