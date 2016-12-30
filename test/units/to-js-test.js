@@ -21,11 +21,13 @@ describe('toJS', () => {
       '.a { color: red; }',
       symbolsCollector,
       {},
-      {}
+      {
+        camelize: true
+      }
     );
 
     assert(
-      result.indexOf('cssModule.defineLocals({"a-key": ["a", "b", "c", [require("/path/to/file"), "importedName"]]});') > -1,
+      result.indexOf('cssModule.defineLocals([[["a-key","aKey"], ["a", "b", "c", [require("/path/to/file"), "importedName"]]]]);') > -1,
       `did not define locals \n${result}`
     );
 

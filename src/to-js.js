@@ -31,24 +31,26 @@ function *generateKeyValuePairs(exports, createKeyVariations = $1 => [$1], creat
   for (const { name, values } of exports) {
     const keys = createKeyVariations(name, ...createKeyVariationsArgs);
 
-    for (const key of keys) {
-      yield [key, values];
-    }
+    yield { keys: [...keys], values: values };
   }
 }
 
 function *generateKeyVariations(key, { camelize }) {
-  yield key;
+  const variations = new Set([key]);
 
   if (camelize === true) {
-    yield camelcase(key);
+    variations.add(camelcase(key));
   }
+
+  yield *variations;
 }
 
 function createLocalsJS(exports, options) {
   const keyValuePairs = generateKeyValuePairs(exports, generateKeyVariations, [options]);
 
-  return jsObjectFromList(keyValuePairs, ([key, value]) => [key, createLocalValueJS(value)]);
+  return jsArrayFromList(keyValuePairs, ({ keys, values }) => {
+    return jsArrayFromList([ stringify(keys), createLocalValueJS(values) ]);
+  });
 }
 
 function createNamespaceAccessorsReducer(accum, name) {

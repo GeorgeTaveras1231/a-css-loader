@@ -1,4 +1,6 @@
 'use strict';
+var forEach = Array.prototype.forEach;
+var push = Array.prototype.push;
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 var stringify = JSON.stringify;
@@ -45,17 +47,17 @@ var CSSModulePrototype = Object.create(Array.prototype, {
         ];
       }
 
-      this.push.apply(this, moduleToImport);
+      push.apply(this, moduleToImport);
     }
   },
   requireAll: {
     value: function requireAll(cssModuleList) {
-      Array.prototype.forEach.call(cssModuleList, this.require, this);
+      forEach.call(cssModuleList, this.require, this);
     }
   },
   defineLocals: {
     value: function defineLocals(localDefinitions) {
-      normalizeLocals(localDefinitions, function (key, value) {
+      eachLocalKV(localDefinitions, function (key, value) {
         this.locals[key] = value;
       }, this);
     }
@@ -84,16 +86,16 @@ function reverseEach(array, cb) {
   }
 }
 
-function eachLocal(module, localName, cb) {
-  var locals;
+function eachLocalValue(module, localName, processValue) {
+  var values;
 
   if (typeof module.locals === 'object') {
-    locals = module.locals[localName];
+    values = module.locals[localName];
   } else {
-    locals = module[localName];
+    values = module[localName];
   }
 
-  (locals || '').split(' ').forEach(cb);
+  (values || '').split(' ').forEach(processValue)
 }
 
 function composeLocals(localValues) {
@@ -103,10 +105,10 @@ function composeLocals(localValues) {
     localValues = localValues.split(/\s*/);
   }
 
-  localValues.forEach(function (valueOrImport) {
+  forEach.call(localValues, function (valueOrImport) {
     /* Its an import if its an array */
     if (Array.isArray(valueOrImport)) {
-      eachLocal(valueOrImport[0], valueOrImport[1], function (importedValue) {
+      eachLocalValue(valueOrImport[0], valueOrImport[1], function (importedValue) {
         uniqueValues[importedValue] = true;
       });
 
@@ -119,14 +121,15 @@ function composeLocals(localValues) {
   return Object.keys(uniqueValues).join(' ');
 }
 
-function normalizeLocals(locals, processLocalDefinition, thisArg) {
-  var key;
+function eachLocalKV(localDefinitions, processLocalDefinition, thisArg) {
+  forEach.call(localDefinitions, function (localDefinition) {
+    var keys = localDefinition[0];
+    var values = localDefinition[1];
 
-  for (key in locals) {
-    if (hasOwnProperty.call(locals, key)) {
-      processLocalDefinition.call(thisArg, key, composeLocals(locals[key]));
-    }
-  }
+    forEach.call(keys, function (key) {
+      processLocalDefinition.call(thisArg, key, composeLocals(values));
+    });
+  });
 }
 
 function initialize(moduleId, css) {
@@ -138,7 +141,7 @@ function initialize(moduleId, css) {
    **/
   module.__proto__ = CSSModulePrototype;
 
-  module.push([ moduleId, css, null ]);
+  push.call(module, [ moduleId, css, null ]);
 
   return module;
 }
