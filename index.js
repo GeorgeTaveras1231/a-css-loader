@@ -3,7 +3,7 @@ const postcss = require('postcss');
 const modulesScope = require('postcss-modules-scope');
 const extractImports = require('postcss-modules-extract-imports');
 const localByDefault = require('postcss-modules-local-by-default');
-const modulesValues = require('postcss-modules-values');
+const modulesValues = require('a-css-loader_postcss-modules-values');
 
 const loaderUtils = require('loader-utils');
 const genericNames = require('generic-names');

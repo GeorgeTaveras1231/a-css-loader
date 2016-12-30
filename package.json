@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "a-css-loader_postcss-modules-values": "^1.2.2",
     "extend": "^3.0.0",
     "loader-utils": "^0.2.16",
     "postcss": "^5.2.6",
