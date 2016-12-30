@@ -53,7 +53,7 @@ function createNamespaceAccessorsReducer(accum, name) {
   return accum + `[${stringify(name)}]`;
 }
 
-function processCSS(css, symbolsCollector) {
+function replaceImportedSymbols(css, symbolsCollector) {
   return stringify(css).replace(IMPORTED_SYMBOL_PATTERN, function (lookupKey) {
     const importRecord = symbolsCollector.getImpoertedItem(lookupKey);
 
@@ -67,7 +67,7 @@ module.exports = function toJS (css, symbolsCollector, loader, options) {
 
   return `
 var builder = require(${safeCSSModulePath});
-var cssModule = builder.initialize(${stringify(moduleID)}, ${processCSS(css, symbolsCollector)});
+var cssModule = builder.initialize(${stringify(moduleID)}, ${replaceImportedSymbols(css, symbolsCollector)});
 
 cssModule.requireAll(${jsArrayFromList(symbolsCollector.urls(), jsRequire)});
 cssModule.defineLocals(${createLocalsJS(symbolsCollector.exports(), options)});
