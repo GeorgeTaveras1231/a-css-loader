@@ -6,12 +6,14 @@
 This loader is different than [webpack/css-loader](https://github.com/webpack/css-loader) in the following ways.
 
 - Allows css-modules to be distributed and re-used as npm packages. (See webpack/css-loader#393)
+- Allows webpack to fully resolve all paths
 - Includes css-modules/values by default
 
 ### Missing features
 
 - Source maps
-- @media queries on imports
+- @media queries after @imports
+- url() for @imports
 
 ## Usage
 
@@ -69,6 +71,22 @@ locals['another-special-color'] === require('./colors.css').locals['another-spec
 
 locals['my-class'] === \
   require('./another-css-file.css').locals['another'] + ' my-class--1a1b2'; // true
+```
+
+### Path resolution
+
+By default, most path references are resolved by webpack. The only exception is in `url()`
+functions. To force them to use webpack to resolve the path, prepend the path with a `~`.
+
+Example:
+```css
+.my-class {
+  background: url('http://not-resolved-by-webpack.com/image')
+}
+
+.my-other-class {
+  background: url('~./path/resolved/by/webpack')
+}
 ```
 
 ### Options
