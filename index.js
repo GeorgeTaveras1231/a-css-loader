@@ -30,8 +30,8 @@ module.exports = function (source) {
 
   const callback = this.async();
 
-  const localsAgent = symbolsCollector.createCollectorAgent(['locals']);
-  const urlsAgent = symbolsCollector.createCollectorAgent([/* no namespace for url requires */]);
+  const localsAgent = symbolsCollector.createImportedItemCollectorAgent(['locals']);
+  const urlsAgent = symbolsCollector.createImportedItemCollectorAgent([/* no namespace for url requires */]);
   postcss([
     localByDefault({ mode }),
     extractImports({ createImportedName: localsAgent }),

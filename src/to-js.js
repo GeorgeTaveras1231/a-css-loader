@@ -14,9 +14,9 @@ const {
 const stringify = JSON.stringify;
 
 function createLocalValueJS (exportedSymbols) {
-  return jsArrayFromList(exportedSymbols, ({name, type, path}) => {
+  return jsArrayFromList(exportedSymbols, ({name, value, type, path}) => {
     if (type === 'local') {
-      return stringify(name);
+      return stringify(value);
     }
 
     if (type === 'imported-item') {
@@ -26,11 +26,11 @@ function createLocalValueJS (exportedSymbols) {
 }
 
 function *generateKeyValuePairs(exports, createKeyVariations = $1 => [$1], createKeyVariationsArgs = []) {
-  for (const { name, value } of exports) {
+  for (const { name, values } of exports) {
     const keys = createKeyVariations(name, ...createKeyVariationsArgs);
 
     for (const key of keys) {
-      yield [key, value];
+      yield [key, values];
     }
   }
 }
@@ -55,7 +55,7 @@ function createNamespaceAccessorsReducer(accum, name) {
 
 function replaceImportedSymbols(css, symbolsCollector) {
   return stringify(css).replace(IMPORTED_SYMBOL_PATTERN, function (lookupKey) {
-    const importRecord = symbolsCollector.getImpoertedItem(lookupKey);
+    const importRecord = symbolsCollector.getImportedItem(lookupKey);
 
     return `" + ${importRecord.toJS()} + "`;
   });
