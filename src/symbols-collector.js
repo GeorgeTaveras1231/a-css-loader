@@ -1,6 +1,7 @@
 const stringify = JSON.stringify;
 const { jsRequire } = require('./utils/code');
 const { values } = require('./utils/object');
+const { map } = require('./utils/generators');
 const { compact } = require('underscore');
 
 function createNamespaceAccessorsReducer(accumulator, name) {
@@ -60,11 +61,15 @@ class SymbolsCollector {
   }
 
   *urls() {
-    yield *this.importedCSSUrls;
+    const urlsFromImportedItems = map(values(this.importedSymbols) , ({ path }) => path);
+    const uniqueUrls = new Set(
+      [
+        ...this.importedCSSUrls,
+        ...urlsFromImportedItems
+      ]
+    );
 
-    for (const { path } of values(this.importedSymbols)) {
-      yield path;
-    }
+    yield *uniqueUrls;
   }
 
   *exports() {

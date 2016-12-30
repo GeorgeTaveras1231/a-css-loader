@@ -10,6 +10,10 @@ describe('toJS', () => {
 
     const importedItemLookupKey = agent('importedName', '/path/to/file');
 
+    /* TODO: Sepearate to another test*/
+    /* This is currently here to cover bug when urls are repeated */
+    agent('anotherItem', '/path/to/file');
+
     symbolsCollector.addUrl('another/url');
 
     symbolsCollector.addExportItem({
