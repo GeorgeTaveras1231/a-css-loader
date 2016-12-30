@@ -25,7 +25,8 @@
     "postcss-modules-local-by-default": "^1.1.1",
     "postcss-modules-scope": "^1.0.2",
     "postcss-modules-values": "^1.2.2",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "underscore.string": "^3.3.4"
   },
   "devDependencies": {
     "css": "^2.2.1",

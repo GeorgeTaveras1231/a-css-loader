@@ -1,8 +1,7 @@
+const { strip } = require('underscore.string');
 const postcss = require('postcss');
 
-function cleanImportUrl(url) {
-  return url.replace(/^(['"])(.+)\1$/g, '$2');
-}
+const stripQuotes = (str) => strip(str, /['"]/);
 
 exports.urlReplacer = postcss.plugin('url-replacer', ({ createImportedName }) => {
   return (css) => {
@@ -32,7 +31,7 @@ exports.urlReplacer = postcss.plugin('url-replacer', ({ createImportedName }) =>
 exports.cssModulesFinalSweeper = postcss.plugin('css-modules-final-sweeper', ({ symbolsCollector }) => {
   return (css) => {
     css.walkAtRules('import', (rule) => {
-      symbolsCollector.addUrl(cleanImportUrl(rule.params));
+      symbolsCollector.addUrl(stripQuotes(rule.params));
       rule.remove();
     });
 

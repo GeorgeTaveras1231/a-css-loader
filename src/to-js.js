@@ -1,6 +1,8 @@
 'use strict';
 
 const { compact } = require('underscore');
+const { camelcase } = require('underscore.string');
+
 const loaderUtils = require('loader-utils');
 
 const { IMPORTED_SYMBOL_PATTERN } = require('./symbols-collector');;
@@ -39,7 +41,7 @@ function *generateKeyVariations(key, { camelize }) {
   yield key;
 
   if (camelize === true) {
-    yield key.replace(/\W(\w)/g, (_, $2) => $2.toUpperCase());
+    yield camelcase(key);
   }
 }
 
