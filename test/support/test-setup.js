@@ -8,16 +8,8 @@ module.exports = function setup(config) {
       this.cssModule = requireFromString(assets['result.js'].source());
       this.parsedCSS = css.parse(this.cssModule.toString());
       this.assets = assets;
-
-      this.cssModule.get = function (local) {
-        if (this.locals[local]) {
-          return this.locals[local];
-        }
-
-        throw new Error(local + ' is not defined');
-      }
     })
     .then(done)
     .catch(done);
-  }
+  };
 };

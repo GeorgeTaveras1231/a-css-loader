@@ -29,7 +29,7 @@ class ImportRecord {
   }
 
   fullNamespace() {
-   return compact(this.namespace.concat(this.name));
+    return compact(this.namespace.concat(this.name));
   }
 
   toJS() {
@@ -91,11 +91,11 @@ class SymbolsCollector {
       this.importedSymbols[key] = new ImportRecord(path, namespace, importedName);
 
       return key;
-    }
+    };
   }
 }
 
-exports.IMPORTED_SYMBOL_PATTERN = /%__imported_item__\d+__%/g
+exports.IMPORTED_SYMBOL_PATTERN = /%__imported_item__\d+__%/g;
 exports.ImportRecord = ImportRecord;
 exports.SymbolsCollector = SymbolsCollector;
 

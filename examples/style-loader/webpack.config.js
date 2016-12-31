@@ -6,7 +6,7 @@ module.exports = {
   context: __dirname,
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: `application.js`,
+    filename: 'application.js',
     libraryTarget: 'umd'
   },
   plugins: [
@@ -26,4 +26,4 @@ module.exports = {
       'node_modules'
     ]
   }
-}
+};

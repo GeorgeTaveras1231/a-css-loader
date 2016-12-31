@@ -7,7 +7,7 @@ module.exports = {
   context: __dirname,
   output: {
     path: path.resolve(__dirname, 'build'),
-    filename: `application.js`,
+    filename: 'application.js',
     libraryTarget: 'umd'
   },
   module: {
@@ -27,4 +27,4 @@ module.exports = {
       'node_modules'
     ]
   }
-}
+};

@@ -2,7 +2,6 @@
 var forEach = Array.prototype.forEach;
 var push = Array.prototype.push;
 
-var hasOwnProperty = Object.prototype.hasOwnProperty;
 var stringify = JSON.stringify;
 
 /* Shared counter to guarantee unique ids for nonCSSModule imports */
@@ -23,7 +22,7 @@ var CSSModulePrototype = Object.create(Array.prototype, {
         visited[id] = true;
 
         css += newCSS;
-      })
+      });
 
       return css;
     }
@@ -34,7 +33,7 @@ var CSSModulePrototype = Object.create(Array.prototype, {
       var moduleToImport;
 
       if (cssModule.__is_css_module__) {
-        moduleToImport = cssModule
+        moduleToImport = cssModule;
       } else {
         css = typeof cssModule.toCssString === 'function' ? cssModule.toCssString() : '';
 
@@ -95,14 +94,14 @@ function eachLocalValue(module, localName, processValue) {
     values = module[localName];
   }
 
-  (values || '').split(' ').forEach(processValue)
+  (values || '').split(/\s+/).forEach(processValue);
 }
 
 function composeLocals(localValues) {
   var uniqueValues = {};
 
   if (typeof localValues === 'string') {
-    localValues = localValues.split(/\s*/);
+    localValues = localValues.split(/\s+/);
   }
 
   forEach.call(localValues, function (valueOrImport) {

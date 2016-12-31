@@ -24,7 +24,7 @@ describe('SymbolsCollector', () => {
   describe('ImportedItemCollectorAgent', () => {
     it('creates import records and provides keys to look them up', () => {
       const subject = new SymbolsCollector;
-      const collectorAgent = subject.createImportedItemCollectorAgent(['namespaceA'])
+      const collectorAgent = subject.createImportedItemCollectorAgent(['namespaceA']);
 
       /* Create an imported items */
       const lookupKey = collectorAgent('itemName', '/item/path');
@@ -40,7 +40,7 @@ describe('SymbolsCollector', () => {
   describe('#urls', () => {
     it('returns urls from imported items', () => {
       const subject = new SymbolsCollector;
-      const collectorAgent = subject.createImportedItemCollectorAgent(['namespaceA'])
+      const collectorAgent = subject.createImportedItemCollectorAgent(['namespaceA']);
 
       collectorAgent('itemName', '/item/path');
 
@@ -61,7 +61,7 @@ describe('SymbolsCollector', () => {
   describe('#exports', () => {
     it('returns imported symbols that are exported', () => {
       const subject = new SymbolsCollector;
-      const collectorAgent = subject.createImportedItemCollectorAgent(['namespaceA'])
+      const collectorAgent = subject.createImportedItemCollectorAgent(['namespaceA']);
 
       const lookupKey = collectorAgent('itemName', '/item/path');
 

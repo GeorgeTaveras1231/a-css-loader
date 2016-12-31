@@ -25,7 +25,7 @@ exports.urlReplacer = postcss.plugin('url-replacer', ({ createImportedName }) =>
 
       css.prepend(rule);
     }
-  }
+  };
 });
 
 exports.cssModulesFinalSweeper = postcss.plugin('css-modules-final-sweeper', ({ symbolsCollector }) => {
@@ -42,11 +42,11 @@ exports.cssModulesFinalSweeper = postcss.plugin('css-modules-final-sweeper', ({ 
 
       if (rule.selector === ':export') {
         rule.walkDecls((declaration) => {
-           symbolsCollector.addExportItem({ name: declaration.prop, values: declaration.value });
+          symbolsCollector.addExportItem({ name: declaration.prop, values: declaration.value });
         });
 
         rule.remove();
       }
     });
-  }
+  };
 });

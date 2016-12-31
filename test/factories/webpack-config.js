@@ -1,5 +1,4 @@
 const path = require('path');
-const extend = require('extend');
 
 const fixturesPath = path.resolve.bind(null, __dirname, '..', 'fixtures');
 
@@ -38,5 +37,5 @@ module.exports = ({
       ]
     }
   };
-}
+};
 

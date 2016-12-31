@@ -6,5 +6,5 @@ module.exports = function assertIncludesClassPattern(classListString, pattern) {
 
   assert(classList.some(c => regexp.test(c)),
     `Expected ${JSON.stringify(classListString)} to include pattern ${JSON.stringify(pattern.toString())}`);
-}
+};
 

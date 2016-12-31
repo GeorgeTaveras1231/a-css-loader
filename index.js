@@ -42,7 +42,7 @@ module.exports = function (source) {
     cssModulesFinalSweeper({ symbolsCollector })
   ])
   .process(source)
-  .then(({ css, messages }) => {
+  .then(({ css }) => {
     callback(null, toJS(css, symbolsCollector, this, options));
   })
   .catch(callback);

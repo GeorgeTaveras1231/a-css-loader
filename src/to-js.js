@@ -1,16 +1,14 @@
 'use strict';
 
-const { compact } = require('underscore');
 const { camelcase } = require('underscore.string');
 
 const loaderUtils = require('loader-utils');
 
-const { IMPORTED_SYMBOL_PATTERN } = require('./symbols-collector');;
+const { IMPORTED_SYMBOL_PATTERN } = require('./symbols-collector');
 
 const {
   jsRequire,
-  jsArrayFromList,
-  jsObjectFromList
+  jsArrayFromList
 } = require('./utils/code');
 
 const stringify = JSON.stringify;
@@ -51,10 +49,6 @@ function createLocalsJS(exports, options) {
   return jsArrayFromList(keyValuePairs, ({ keys, values }) => {
     return jsArrayFromList([ stringify(keys), createLocalValueJS(values) ]);
   });
-}
-
-function createNamespaceAccessorsReducer(accum, name) {
-  return accum + `[${stringify(name)}]`;
 }
 
 function replaceImportedSymbols(css, symbolsCollector) {

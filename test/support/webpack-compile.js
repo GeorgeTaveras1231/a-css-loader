@@ -1,4 +1,3 @@
-const requireFromString = require('require-from-string');
 const webpack = require('webpack');
 const MemoryFs = require('memory-fs');
 
@@ -17,11 +16,11 @@ module.exports = function (webpackConfig) {
         const { compilation } = stats;
 
         if ( compilation.errors.length > 0 ) {
-          reject(compilation.errors)
+          reject(compilation.errors);
         } else {
           resolve(compilation.assets);
         }
       }
     });
   });
-}
+};
