@@ -1,5 +1,4 @@
 const assert = require('assert');
-const css = require('css');
 
 const configFactory = require('../factories/webpack-config');
 const setup = require('../support/test-setup');
@@ -24,7 +23,7 @@ describe('@value', () => {
   });
 
   it('replaces the values', function () {
-    const declarations  = css.parse(this.cssModule.toString()).stylesheet.rules[0].declarations;
+    const declarations  = this.parsedCSS.stylesheet.rules[0].declarations;
     assert.equal(declarations[0].value, '10px');
     assert.equal(declarations[1].value, 'red');
   });

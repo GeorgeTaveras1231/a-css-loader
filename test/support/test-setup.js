@@ -6,7 +6,8 @@ module.exports = function setup(config) {
   return function (done) {
     webpackCompile(config).then((assets) => {
       this.cssModule = requireFromString(assets['result.js'].source());
-      this.parsedCSS = css.parse(this.cssModule.toString());
+      this.cssString = this.cssModule.toString();
+      this.parsedCSS = css.parse(this.cssString);
       this.assets = assets;
     })
     .then(done)
