@@ -55,9 +55,6 @@ var CSSModulePrototype = Object.create(Array.prototype, {
   __is_css_module__: { value: true }
 });
 
-function CSSModule() {}
-CSSModule.prototype = CSSModulePrototype;
-
 /* Shared counter to guarantee unique ids for nonCSSModule imports */
 var nonCSSModuleImportId = 0;
 function normalizeRequire(parentModule, requiredModule) {
