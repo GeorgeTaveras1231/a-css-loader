@@ -67,7 +67,7 @@ module.exports = function toJS (css, symbolsCollector, loader, options) {
 var builder = require(${safeCSSModulePath});
 var cssModule = builder.initialize(${stringify(moduleID)}, ${replaceImportedSymbols(css, symbolsCollector)});
 
-cssModule.requireAll(${jsArrayFromList(symbolsCollector.urls(), jsRequire)});
+cssModule.importEach(${jsArrayFromList(symbolsCollector.urls(), jsRequire)});
 cssModule.defineLocals(${createLocalsJS(symbolsCollector.exports(), options)});
 
 module.exports = exports.default = cssModule;`;

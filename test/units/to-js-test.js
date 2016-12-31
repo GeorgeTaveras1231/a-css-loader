@@ -36,7 +36,7 @@ describe('toJS', () => {
     );
 
     assert(
-      result.indexOf('cssModule.requireAll([require("another/url"), require("/path/to/file")])') > -1,
+      result.indexOf('cssModule.importEach([require("another/url"), require("/path/to/file")])') > -1,
       `did not import modules \n${result}`
     );
   });

@@ -5,56 +5,28 @@ var forEach = Array.prototype.forEach;
 var reduce = Array.prototype.reduce;
 var push = Array.prototype.push;
 
-var CSSModulePrototype = Object.create(Array.prototype, {
-  toString: {
-    value: function toString() {
-      return reduce.call(this, function (cssString, subModule) {
-        return subModule[1] + cssString;
-      }, '');
-    }
-  },
-  require: {
-    value: function require(cssModule) {
-      forEach.call(normalizeRequire(this, cssModule), function (subModule) {
-        var id = subModule[0];
-
-        if (!this.__already_required__[id]) {
-          this.__already_required__[id] = true;
-
-          push.call(this, subModule);
-        }
-      }, this);
-    }
-  },
-  requireAll: {
-    value: function requireAll(cssModuleList) {
-      forEach.call(cssModuleList, this.require, this);
-    }
-  },
-  defineLocals: {
-    value: function defineLocals(localDefinitions) {
-      eachLocalKV(localDefinitions, function (key, value) {
-        this.locals[key] = value;
-      }, this);
-    }
-  },
-  get: {
-    value: function get(local) {
-      if (this.locals[local] === undefined) {
-        throw new Error(stringify(local) + ' is not defined in ' + stringify(this.locals, null, 2));
-      }
-
-      return this.locals[local];
-    }
-  },
-  id: {
-    get: function() {
-      return this[0][0];
-    }
-  },
+var CSSModuleStaticProperties = {
+  toString: { value: toString },
+  importEach: { value: importEach },
+  defineLocals: { value: defineLocals },
+  get: { value: getLocal },
+  id: { get: getId },
   __is_css_module__: { value: true }
-});
+};
 
+exports.initialize = function initialize(moduleId, css) {
+  var module = [];
+
+  Object.defineProperties(module, CSSModuleStaticProperties);
+  Object.defineProperties(module, {
+    locals: { value: {} },
+    __imported_modules__: { value: {} }
+  });
+
+  module.push([ moduleId, css, null ]);
+
+  return module;
+};
 /* Shared counter to guarantee unique ids for nonCSSModule imports */
 var nonCSSModuleImportId = 0;
 function normalizeRequire(parentModule, requiredModule) {
@@ -116,22 +88,43 @@ function eachLocalKV(localDefinitions, processLocalDefinition, thisArg) {
   });
 }
 
-function initialize(moduleId, css) {
-  var module = [];
-  module.locals = {};
 
-  /* Change the prototype of array to add method overrides that are not 'own keys' */
-  /* This is kinda strange I know. I tried making a separate constructor that inherits from
-   * The Array.prototype but the ExtractTextPlugin depends on the modules being native arrays.
-   **/
-  Object.setPrototypeOf(module, CSSModulePrototype);
-
-  /* lookup table to ensure modules are required once */
-  Object.defineProperty(module, '__already_required__', { value: {} });
-
-  push.call(module, [ moduleId, css, null ]);
-
-  return module;
+function toString() {
+  return reduce.call(this, function (cssString, subModule) {
+    return subModule[1] + cssString;
+  }, '');
 }
 
-exports.initialize = initialize;
+function importModule(cssModule) {
+  forEach.call(normalizeRequire(this, cssModule), function (subModule) {
+    var id = subModule[0];
+
+    if (!this.__imported_modules__[id]) {
+      this.__imported_modules__[id] = true;
+
+      push.call(this, subModule);
+    }
+  }, this);
+}
+
+function importEach(cssModuleList) {
+  forEach.call(cssModuleList, importModule, this);
+}
+
+function defineLocals(localDefinitions) {
+  eachLocalKV(localDefinitions, function (key, value) {
+    this.locals[key] = value;
+  }, this);
+}
+
+function getLocal(local) {
+  if (this.locals[local] === undefined) {
+    throw new Error(stringify(local) + ' is not defined in ' + stringify(this.locals, null, 2));
+  }
+
+  return this.locals[local];
+}
+
+function getId() {
+  return this[0][0];
+}
