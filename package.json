@@ -7,7 +7,7 @@
     "test-files": "test/cases/*-test.js test/units/*-test.js"
   },
   "scripts": {
-    "test": "mocha $npm_package_config_test_files",
+    "test": "mocha $npm_package_config_test_files && npm run lint",
     "lint": "eslint ."
   },
   "keywords": [
