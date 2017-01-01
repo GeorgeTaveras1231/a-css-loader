@@ -1,4 +1,5 @@
 'use strict';
+
 var stringify = JSON.stringify;
 var isArray = Array.isArray;
 var forEach = Array.prototype.forEach;
@@ -27,6 +28,7 @@ exports.initialize = function initialize(moduleId, css) {
 
   return module;
 };
+
 /* Shared counter to guarantee unique ids for nonCSSModule imports */
 var nonCSSModuleImportId = 0;
 function normalizeRequire(parentModule, requiredModule) {
@@ -87,7 +89,6 @@ function eachLocalKV(localDefinitions, processLocalDefinition, thisArg) {
     });
   });
 }
-
 
 function toString() {
   return reduce.call(this, function (cssString, subModule) {
