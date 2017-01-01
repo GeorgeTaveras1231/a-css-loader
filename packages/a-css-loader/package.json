@@ -1,6 +1,6 @@
 {
   "name": "a-css-loader",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "",
   "main": "index.js",
   "config": {
@@ -28,7 +28,7 @@
     "postcss-modules-values": "^1.2.2",
     "underscore": "^1.8.3",
     "underscore.string": "^3.3.4",
-    "css-module-builder": "^1.0.0-beta"
+    "css-module-builder": "^1.0.0-beta.3"
   },
   "devDependencies": {
     "css": "^2.2.1",
