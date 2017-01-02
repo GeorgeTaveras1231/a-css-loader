@@ -10,8 +10,7 @@ var CSSModuleStaticProperties = {
   toString: { value: toString },
   importEach: { value: importEach },
   defineLocals: { value: defineLocals },
-  get: { value: getLocal },
-  id: { get: getId },
+  get: { value: strictGetLocal },
   __is_css_module__: { value: true }
 };
 
@@ -31,7 +30,7 @@ exports.initialize = function initialize(moduleId, css) {
 
 /* Shared counter to guarantee unique ids for nonCSSModule imports */
 var nonCSSModuleImportId = 0;
-function normalizeRequire(parentModule, requiredModule) {
+function normalizeImport(parentModule, requiredModule) {
   var css, id;
 
   if (requiredModule.__is_css_module__) {
@@ -39,7 +38,7 @@ function normalizeRequire(parentModule, requiredModule) {
   }
 
   if (typeof requiredModule.toCssString === 'function') {
-    id = parentModule.id + '/import__' + nonCSSModuleImportId++;
+    id = getId(parentModule) + '/import__' + nonCSSModuleImportId++;
     css = requiredModule.toCssString();
 
     return [ [ id, css, null ] ];
@@ -97,7 +96,7 @@ function toString() {
 }
 
 function importModule(cssModule) {
-  forEach.call(normalizeRequire(this, cssModule), function (subModule) {
+  forEach.call(normalizeImport(this, cssModule), function (subModule) {
     var id = subModule[0];
 
     if (!this.__imported_modules__[id]) {
@@ -118,7 +117,7 @@ function defineLocals(localDefinitions) {
   }, this);
 }
 
-function getLocal(local) {
+function strictGetLocal(local) {
   if (this.locals[local] === undefined) {
     throw new Error(stringify(local) + ' is not defined in ' + stringify(this.locals, null, 2));
   }
@@ -126,6 +125,6 @@ function getLocal(local) {
   return this.locals[local];
 }
 
-function getId() {
-  return this[0][0];
+function getId(module) {
+  return module[0][0];
 }
