@@ -23,11 +23,5 @@ module.exports = {
   plugins: [
     extractCSS,
     new OptimizeCSSAssets(),
-  ],
-  resolveLoader: {
-    modulesDirectories: [
-      path.resolve(__dirname, '..', '..', '..'),
-      'node_modules'
-    ]
-  }
+  ]
 };
