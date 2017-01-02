@@ -45,7 +45,7 @@ describe('toJS', () => {
 
   describe('#requireBuilder', () => {
     it('requires the css-module-buulder and assigns it to builder var', () => {
-      const result = toJS.requireBuilder()
+      const result = toJS.requireBuilder();
       assert.equal('var builder = require("css-module-builder");', result);
     });
   });

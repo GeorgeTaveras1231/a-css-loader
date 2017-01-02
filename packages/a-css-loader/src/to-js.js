@@ -61,7 +61,7 @@ function replaceImportedSymbols(css, symbolsCollector) {
 
 function toJSrequireBuilder() {
   return `var builder = ${jsRequire('css-module-builder')};`;
-};
+}
 
 function toJS (css, symbolsCollector, loader, options) {
   const moduleID = loaderUtils.getHashDigest(css, 'md5', 'hex');
@@ -74,7 +74,7 @@ cssModule.importEach(${jsArrayFromList(symbolsCollector.urls(), jsRequire)});
 cssModule.defineLocals(${createLocalsJS(symbolsCollector.exports(), options)});
 
 module.exports = exports.default = cssModule;`;
-};
+}
 
 module.exports = toJS;
 module.exports.requireBuilder = toJSrequireBuilder;
