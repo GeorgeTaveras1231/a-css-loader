@@ -60,7 +60,7 @@ function replaceImportedSymbols(css, symbolsCollector) {
 }
 
 module.exports = function toJS (css, symbolsCollector, loader, options) {
-  const safeCSSModulePath = loaderUtils.stringifyRequest(loader, require.resolve('css-module-builder'));
+  const safeCSSModulePath = loaderUtils.stringifyRequest(loader, 'css-module-builder');
   const moduleID = loaderUtils.getHashDigest(css, 'md5', 'hex');
 
   return `
