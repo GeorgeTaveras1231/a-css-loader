@@ -59,12 +59,15 @@ function replaceImportedSymbols(css, symbolsCollector) {
   });
 }
 
-module.exports = function toJS (css, symbolsCollector, loader, options) {
-  const safeCSSModulePath = loaderUtils.stringifyRequest(loader, 'css-module-builder');
+function toJSrequireBuilder() {
+  return `var builder = ${jsRequire('css-module-builder')};`;
+};
+
+function toJS (css, symbolsCollector, loader, options) {
   const moduleID = loaderUtils.getHashDigest(css, 'md5', 'hex');
 
   return `
-var builder = require(${safeCSSModulePath});
+${toJSrequireBuilder()}
 var cssModule = builder.initialize(${stringify(moduleID)}, ${replaceImportedSymbols(css, symbolsCollector)});
 
 cssModule.importEach(${jsArrayFromList(symbolsCollector.urls(), jsRequire)});
@@ -72,3 +75,6 @@ cssModule.defineLocals(${createLocalsJS(symbolsCollector.exports(), options)});
 
 module.exports = exports.default = cssModule;`;
 };
+
+module.exports = toJS;
+module.exports.requireBuilder = toJSrequireBuilder;
