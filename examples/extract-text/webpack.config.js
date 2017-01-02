@@ -4,7 +4,7 @@ const ExtractText = require('extract-text-webpack-plugin');
 const css = new ExtractText('application.css');
 
 module.exports = {
-  entry: './application.js',
+  entry: './application.css',
   context: __dirname,
   output: {
     path: path.resolve(__dirname, 'build'),
@@ -16,20 +16,10 @@ module.exports = {
       {
         test: /\.css$/,
         loader: css.loader('&remove=true!a-css-loader?'),
-      },
-      {
-        test: /\.jpg$/,
-        loader: 'file-loader'
       }
     ],
   },
   plugins: [
     css
-  ],
-  resolveLoader: {
-    modulesDirectories: [
-      path.resolve(__dirname, '..', '..', '..'),
-      'node_modules'
-    ]
-  }
+  ]
 };

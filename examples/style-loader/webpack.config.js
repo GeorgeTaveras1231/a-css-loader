@@ -19,11 +19,5 @@ module.exports = {
         loaders: ['style', 'a-css-loader'],
       }
     ],
-  },
-  resolveLoader: {
-    modulesDirectories: [
-      path.resolve(__dirname, '..', '..', '..'),
-      'node_modules'
-    ]
   }
 };
