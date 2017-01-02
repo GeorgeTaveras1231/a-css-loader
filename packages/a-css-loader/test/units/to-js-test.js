@@ -3,8 +3,7 @@ const toJS = require('../../src/to-js');
 const { SymbolsCollector } = require('../../src/symbols-collector');
 
 describe('toJS', () => {
-  /* These test are really brittle but I atleast wanted to one on set of tests for this function */
-  it('creates a webpack compatible js hunk', () => {
+  before(function () {
     const symbolsCollector = new SymbolsCollector;
     const agent = symbolsCollector.createImportedItemCollectorAgent();
 
@@ -21,7 +20,7 @@ describe('toJS', () => {
       values: `a b c ${importedItemLookupKey}`
     });
 
-    const result = toJS(
+    this.result = toJS(
       '.a { color: red; }',
       symbolsCollector,
       {},
@@ -30,14 +29,24 @@ describe('toJS', () => {
       }
     );
 
+  });
+  /* These test are really brittle but I atleast wanted to one on set of tests for this function */
+  it('creates a webpack compatible js hunk', function () {
     assert(
-      result.indexOf('cssModule.defineLocals([[["a-key","aKey"], ["a", "b", "c", [require("/path/to/file"), "importedName"]]]]);') > -1,
-      `did not define locals \n${result}`
+      this.result.indexOf('cssModule.defineLocals([[["a-key","aKey"], ["a", "b", "c", [require("/path/to/file"), "importedName"]]]]);') > -1,
+      `did not define locals \n${this.result}`
     );
 
     assert(
-      result.indexOf('cssModule.importEach([require("another/url"), require("/path/to/file")])') > -1,
-      `did not import modules \n${result}`
+      this.result.indexOf('cssModule.importEach([require("another/url"), require("/path/to/file")])') > -1,
+      `did not import modules \n${this.result}`
     );
+  });
+
+  describe('#requireBuilder', () => {
+    it('requires the css-module-buulder and assigns it to builder var', () => {
+      const result = toJS.requireBuilder()
+      assert.equal('var builder = require("css-module-builder");', result);
+    });
   });
 });
