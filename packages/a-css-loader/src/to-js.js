@@ -11,10 +11,12 @@ const {
   jsArrayFromList
 } = require('./utils/code');
 
+const { map } = require('./utils/generators');
+
 const stringify = JSON.stringify;
 
 function createLocalValueJS (exportedSymbols) {
-  return jsArrayFromList(exportedSymbols, ({name, value, type, path}) => {
+  return jsArrayFromList(map(exportedSymbols, ({name, value, type, path}) => {
     if (type === 'local') {
       return stringify(value);
     }
@@ -22,7 +24,7 @@ function createLocalValueJS (exportedSymbols) {
     if (type === 'imported-item') {
       return jsArrayFromList([jsRequire(path), stringify(name)]);
     }
-  });
+  }));
 }
 
 function *generateKeyValuePairs(exports, createKeyVariations = $1 => [$1], createKeyVariationsArgs = []) {
@@ -46,9 +48,11 @@ function *generateKeyVariations(key, { camelize }) {
 function createLocalsJS(exports, options) {
   const keyValuePairs = generateKeyValuePairs(exports, generateKeyVariations, [options]);
 
-  return jsArrayFromList(keyValuePairs, ({ keys, values }) => {
+  const keyValuesAsArrays = map(keyValuePairs, ({ keys, values }) => {
     return jsArrayFromList([ stringify(keys), createLocalValueJS(values) ]);
   });
+
+  return jsArrayFromList(keyValuesAsArrays);
 }
 
 function replaceImportedSymbols(css, symbolsCollector) {
@@ -59,7 +63,11 @@ function replaceImportedSymbols(css, symbolsCollector) {
   });
 }
 
-function toJSrequireBuilder() {
+function jsImportArray(urls) {
+  return jsArrayFromList(map(urls, jsRequire));
+}
+
+function jsRequireBuilder() {
   return `var builder = ${jsRequire('css-module-builder')};`;
 }
 
@@ -67,14 +75,14 @@ function toJS (css, symbolsCollector, loader, options) {
   const moduleID = loaderUtils.getHashDigest(css, 'md5', 'hex');
 
   return `
-${toJSrequireBuilder()}
+${jsRequireBuilder()}
 var cssModule = builder.initialize(${stringify(moduleID)}, ${replaceImportedSymbols(css, symbolsCollector)});
 
-cssModule.importEach(${jsArrayFromList(symbolsCollector.urls(), jsRequire)});
+cssModule.importEach(${jsImportArray(symbolsCollector.urls())});
 cssModule.defineLocals(${createLocalsJS(symbolsCollector.exports(), options)});
 
 module.exports = exports.default = cssModule;`;
 }
 
 module.exports = toJS;
-module.exports.requireBuilder = toJSrequireBuilder;
+module.exports.requireBuilder = jsRequireBuilder;

@@ -4,11 +4,11 @@ exports.jsRequire = function jsRequire(path) {
   return `require(${stringify(path)})`;
 };
 
-exports.jsArrayFromList = function jsArrayFromList(list, mapper = $1 => $1, callbackArgs = []) {
+exports.jsArrayFromList = function jsArrayFromList(list) {
   let js = '';
 
   for(const value of list)  {
-    js += mapper(value, ...callbackArgs);
+    js += value;
     js += ', ';
   }
 
