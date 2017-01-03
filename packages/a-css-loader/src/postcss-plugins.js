@@ -8,9 +8,8 @@ exports.urlReplacer = postcss.plugin('url-replacer', ({ createImportedName }) =>
     css.walkRules((rule) => {
       rule.walkDecls((declaration) => {
         declaration.value = declaration.value.replace(/url\((['"]?)~(.+)\1\)/g, (_whole, _quote, url) => {
-          const alias = createImportedName(null, url);
-
-          return `url(${alias})`;
+          const identifier = createImportedName(null, url);
+          return `url(${identifier})`;
         });
       });
     });
