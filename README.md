@@ -9,6 +9,10 @@ This loader is different than [webpack/css-loader](https://github.com/webpack/cs
 - Allows webpack to fully resolve all paths
 - Support css-modules/value (@value syntax)
 
+### TOC
+
+- [Examples](./examples/)
+
 ### Missing features
 
 - Source maps
