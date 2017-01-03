@@ -9,7 +9,6 @@ describe('minification', () => {
   before(setup(webpackConfig));
 
   it('minifies the css', function () {
-    console.log(this.cssString);
     assert.equal(this.parsedCSS.stylesheet.rules.length, 2);
   });
 });
