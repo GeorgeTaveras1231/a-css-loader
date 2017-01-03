@@ -15,15 +15,13 @@ var CSSModuleStaticProperties = {
 };
 
 exports.initialize = function initialize(moduleId, css) {
-  var module = [];
+  var module = [[ moduleId, css, null ]];
 
   Object.defineProperties(module, CSSModuleStaticProperties);
   Object.defineProperties(module, {
     locals: { value: {} },
     __imported_modules__: { value: {} }
   });
-
-  module.push([ moduleId, css, null ]);
 
   return module;
 };
