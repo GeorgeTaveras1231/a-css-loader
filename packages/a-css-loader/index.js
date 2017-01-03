@@ -7,6 +7,7 @@ const modulesValues = require('a-css-loader_postcss-modules-values');
 
 const loaderUtils = require('loader-utils');
 const genericNames = require('generic-names');
+const cssnano = require('cssnano');
 const extend = require('extend');
 
 const { SymbolsCollector } = require('./src/symbols-collector');
@@ -17,30 +18,45 @@ const LOADER_NAME = 'a-css-loader';
 const DEFAULT_OPTIONS = Object.freeze({
   mode: 'pure',
   scopedNameFormat: '[local]--[hash:5]',
-  camelize: false
+  camelize: false,
+  minimize: true
 });
 
-module.exports = function (source) {
-  this.cacheable();
-
-  const options = extend({}, DEFAULT_OPTIONS, loaderUtils.getLoaderConfig(this, LOADER_NAME));
-  const symbolsCollector = new SymbolsCollector;
-
-  const { mode, scopedNameFormat } = options;
-
-  const callback = this.async();
-
+function postcssPlugins(symbolsCollector, {
+  mode,
+  scopedNameFormat,
+  minimize
+}) {
   const localsAgent = symbolsCollector.createImportedItemCollectorAgent(['locals']);
   const urlsAgent = symbolsCollector.createImportedItemCollectorAgent([/* no namespace for url requires */]);
 
-  postcss([
+  const plugins = [
     localByDefault({ mode }),
     extractImports({ createImportedName: localsAgent }),
     urlReplacer({ createImportedName: urlsAgent }),
     modulesValues({ createImportedName: localsAgent }),
     modulesScope({ generateScopedName: genericNames(scopedNameFormat) }),
     cssModulesFinalSweeper({ symbolsCollector })
-  ])
+  ];
+
+  if (minimize) {
+    plugins.push(cssnano());
+  }
+
+  return plugins;
+}
+
+module.exports = function (source) {
+  this.cacheable();
+
+  const symbolsCollector = new SymbolsCollector;
+  const options = extend({}, DEFAULT_OPTIONS, loaderUtils.getLoaderConfig(this, LOADER_NAME));
+
+  const callback = this.async();
+
+  postcss(
+    postcssPlugins(symbolsCollector, options)
+  )
   .process(source)
   .then(({ css }) => {
     callback(null, toJS(css, symbolsCollector, this, options));

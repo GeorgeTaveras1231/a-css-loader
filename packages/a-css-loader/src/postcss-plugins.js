@@ -14,7 +14,7 @@ exports.urlReplacer = postcss.plugin('url-replacer', ({ createImportedName }) =>
 
           imports.add({ alias, url });
 
-          return `url('${alias}')`;
+          return `url(${alias})`;
         });
       });
     });
