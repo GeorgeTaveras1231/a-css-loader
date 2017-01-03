@@ -18,6 +18,8 @@
   "license": "ISC",
   "dependencies": {
     "a-css-loader_postcss-modules-values": "^1.2.2",
+    "css-module-builder": "^1.0.0-beta.3",
+    "cssnano": "^3.9.1",
     "extend": "^3.0.0",
     "loader-utils": "^0.2.16",
     "postcss": "^5.2.6",
@@ -27,8 +29,7 @@
     "postcss-modules-scope": "^1.0.2",
     "postcss-modules-values": "^1.2.2",
     "underscore": "^1.8.3",
-    "underscore.string": "^3.3.4",
-    "css-module-builder": "^1.0.0-beta.3"
+    "underscore.string": "^3.3.4"
   },
   "devDependencies": {
     "css": "^2.2.1",
