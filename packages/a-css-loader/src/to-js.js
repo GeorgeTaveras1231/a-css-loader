@@ -27,14 +27,6 @@ function createLocalValueJS (exportedSymbols) {
   }));
 }
 
-function *generateKeyValuePairs(exports, createKeyVariations = $1 => [$1], createKeyVariationsArgs = []) {
-  for (const { name, values } of exports) {
-    const keys = createKeyVariations(name, ...createKeyVariationsArgs);
-
-    yield { keys: [...keys], values: values };
-  }
-}
-
 function *generateKeyVariations(key, { camelize }) {
   const variations = new Set([key]);
 
@@ -45,14 +37,28 @@ function *generateKeyVariations(key, { camelize }) {
   yield *variations;
 }
 
+/* Create an array of arrays of arrays :)
+ *
+ * [
+ *   [
+ *     [], // keys
+ *     []  // values
+ *   ] // Local definition
+ * ]
+ *
+ * */
 function createLocalsJS(exports, options) {
-  const keyValuePairs = generateKeyValuePairs(exports, generateKeyVariations, [options]);
+  const keyValuePairs = map(exports, ({ name, values }) => {
+    const keys = generateKeyVariations(name, options);
+    const jsValue = createLocalValueJS(values);
 
-  const keyValuesAsArrays = map(keyValuePairs, ({ keys, values }) => {
-    return jsArrayFromList([ stringify(keys), createLocalValueJS(values) ]);
+    return jsArrayFromList([
+      stringify([...keys]),
+      jsValue
+    ]);
   });
 
-  return jsArrayFromList(keyValuesAsArrays);
+  return jsArrayFromList(keyValuePairs);
 }
 
 function replaceImportedSymbols(css, symbolsCollector) {
