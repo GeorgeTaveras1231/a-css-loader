@@ -5,26 +5,15 @@ const stripQuotes = (str) => strip(str, /['"]/);
 
 exports.urlReplacer = postcss.plugin('url-replacer', ({ createImportedName }) => {
   return (css) => {
-    const imports = new Set;
-
     css.walkRules((rule) => {
       rule.walkDecls((declaration) => {
         declaration.value = declaration.value.replace(/url\((['"]?)~(.+)\1\)/g, (_whole, _quote, url) => {
           const alias = createImportedName(null, url);
 
-          imports.add({ alias, url });
-
           return `url(${alias})`;
         });
       });
     });
-
-    for ( let i of imports ) {
-      const rule = postcss.rule({ selector: `:import(${i.url})` });
-      rule.append(postcss.decl({ prop: i.alias, value: '' }));
-
-      css.prepend(rule);
-    }
   };
 });
 
