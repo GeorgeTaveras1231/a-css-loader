@@ -61,11 +61,19 @@ function createLocalsJS(exports, options) {
   return jsArrayFromList(keyValuePairs);
 }
 
+function isALocalImport(importRecord) {
+  return importRecord.name && importRecord.namespace.indexOf('locals') === 0 && importRecord.namespace.length === 1;
+}
+
 function replaceImportedSymbols(css, symbolsCollector) {
   return stringify(css).replace(IMPORTED_SYMBOL_PATTERN, function (lookupKey) {
     const importRecord = symbolsCollector.getImportedItem(lookupKey);
 
-    return `" + ${importRecord.toJS()} + "`;
+    if (isALocalImport(importRecord)) {
+      return `" + builder.getLocal(${jsRequire(importRecord.path)}, ${stringify(importRecord.name)}) + "`;
+    } else {
+      return `" + ${importRecord.toJS()} + "`;
+    }
   });
 }
 

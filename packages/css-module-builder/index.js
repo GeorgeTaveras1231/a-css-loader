@@ -26,6 +26,20 @@ exports.initialize = function initialize(moduleId, css) {
   return module;
 };
 
+exports.getLocal = getLocal;
+
+function getLocal(module, localName) {
+  var values;
+
+  if (typeof module.locals === 'object') {
+    values = module.locals[localName];
+  } else {
+    values = module[localName];
+  }
+
+  return (values || '');
+}
+
 /* Shared counter to guarantee unique ids for nonCSSModule imports */
 var nonCSSModuleImportId = 0;
 function normalizeImport(parentModule, requiredModule) {
@@ -46,15 +60,7 @@ function normalizeImport(parentModule, requiredModule) {
 }
 
 function eachLocalValue(module, localName, processValue) {
-  var values;
-
-  if (typeof module.locals === 'object') {
-    values = module.locals[localName];
-  } else {
-    values = module[localName];
-  }
-
-  (values || '').split(/\s+/).forEach(processValue);
+  getLocal(module, localName).split(/\s+/).forEach(processValue);
 }
 
 function composeLocals(localValues) {
