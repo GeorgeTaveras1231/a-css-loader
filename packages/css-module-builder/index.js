@@ -58,7 +58,7 @@ exports.getLocal = getLocal;
 
 function getLocal(module, localName) {
   if (typeof module.locals === 'object') {
-    return module.locals[localName];
+    return module.locals[localName] || '';
   }
 
   if (module[localName] && isALocalDefinition(module, localName)) {

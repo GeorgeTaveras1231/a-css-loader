@@ -62,9 +62,11 @@ describe('builder', () => {
 
       const result1 = builder.getLocal(otherMod, 'a');
       const result2 = builder.getLocal(otherMod, 'forEach');
+      const result3 = builder.getLocal({locals: {}}, 'unknonwn');
 
      assert.equal(result1, 'test');
      assert.equal(result2, '');
+     assert.equal(result3, '');
     });
   });
 });
