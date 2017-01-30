@@ -1,6 +1,6 @@
 {
   "name": "a-css-loader",
-  "version": "1.0.0-beta.6",
+  "version": "1.0.0-beta.7",
   "description": "",
   "main": "index.js",
   "config": {
@@ -18,7 +18,7 @@
   "license": "ISC",
   "dependencies": {
     "a-css-loader_postcss-modules-values": "^1.2.2",
-    "css-module-builder": "^1.0.0-beta.5",
+    "css-module-builder": "^1.0.0-beta.6",
     "cssnano": "^3.9.1",
     "extend": "^3.0.0",
     "loader-utils": "^0.2.16",
