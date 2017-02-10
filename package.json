@@ -13,10 +13,10 @@
   ],
   "author": "",
   "license": "ISC",
-  "dependencies": { },
+  "dependencies": {},
   "devDependencies": {
     "eslint": "^3.12.2",
     "eslint-plugin-mocha": "^4.8.0",
-    "lerna": "2.0.0-beta.31"
+    "lerna": "2.0.0-beta.36"
   }
 }
