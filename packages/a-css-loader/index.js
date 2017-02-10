@@ -40,7 +40,8 @@ function postcssPlugins(symbolsCollector, {
   ];
 
   if (minimize) {
-    plugins.push(cssnano());
+    const options = typeof minimize === 'object' ? minimize : {};
+    plugins.push(cssnano(options));
   }
 
   return plugins;
