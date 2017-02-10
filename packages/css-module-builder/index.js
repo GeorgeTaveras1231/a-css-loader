@@ -72,7 +72,7 @@ function getLocal(module, localName) {
  * Ensures it is an enumerable property that is not an array element
  */
 function isALocalDefinition(module, local) {
-  return isEnumerable.call(module, local) && !/^\d+$/.test(local)
+  return isEnumerable.call(module, local) && !/^\d+$/.test(local);
 }
 
 function createLocals() {
