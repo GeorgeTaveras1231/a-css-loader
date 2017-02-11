@@ -3,16 +3,19 @@ const postcss = require('postcss');
 
 const stripQuotes = (str) => strip(str, /['"]/);
 
+function replaceUrls(rule, createImportedName) {
+  rule.walkDecls((declaration) => {
+    declaration.value = declaration.value.replace(/url\((['"]?)~([^\)]+)\1\)/g, (_whole, _quote, url) => {
+      const identifier = createImportedName(null, url);
+      return `url(${identifier})`;
+    });
+  });
+}
+
 exports.urlReplacer = postcss.plugin('url-replacer', ({ createImportedName }) => {
   return (css) => {
-    css.walkRules((rule) => {
-      rule.walkDecls((declaration) => {
-        declaration.value = declaration.value.replace(/url\((['"]?)~(.+)\1\)/g, (_whole, _quote, url) => {
-          const identifier = createImportedName(null, url);
-          return `url(${identifier})`;
-        });
-      });
-    });
+    css.walkAtRules('font-face', rule => replaceUrls(rule, createImportedName));
+    css.walkRules(rule => replaceUrls(rule, createImportedName));
   };
 });
 

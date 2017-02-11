@@ -1,4 +1,10 @@
+@font-face {
+  font-family: 'font-name';
+  src: url(~./font.woff) format(woff);
+}
+
 .test {
   background: url(~./obama.jpg) #fff;
+  font-family: 'font-name';
 }
 

@@ -12,8 +12,23 @@ describe('url', () => {
   before(setup(webpackConfig));
 
   it('integrates urls with webpack', function () {
-    const backgroundDeclaration = this.parsedCSS.stylesheet.rules[0].declarations[0].value.split(' ');
+    const ruleWithBackground = this.parsedCSS.stylesheet.rules.find((rule) => rule.type === 'rule');
+    const backgroundDeclaration = ruleWithBackground.declarations[0].value.split(' ');
 
     assert.equal(backgroundDeclaration[0], 'url(generated-by-webpack-2e7f69.jpg)');
+  });
+
+  it('works in @font-face\'s', function () {
+    const fontFaceRule = this.parsedCSS.stylesheet.rules.find((rule) => rule.type === 'font-face');
+    const backgroundDeclaration = fontFaceRule.declarations[1].value.split(' ');
+
+    assert.equal(backgroundDeclaration[0], 'url(generated-by-webpack-38faa7.woff)');
+  });
+
+  it('works with other functions in same line', function () {
+    const fontFaceRule = this.parsedCSS.stylesheet.rules.find((rule) => rule.type === 'font-face');
+    const backgroundDeclaration = fontFaceRule.declarations[1].value.split(' ');
+
+    assert.equal(backgroundDeclaration[1], 'format(woff)');
   });
 });

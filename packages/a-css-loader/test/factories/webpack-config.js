@@ -14,7 +14,7 @@ module.exports = ({
       loader: 'a-css-loader'
     },
     {
-      test: /\.jpg$/,
+      test: /\.(jpg|woff)$/,
       loader: 'file-loader?name=generated-by-webpack-[hash:6].[ext]&emitFile=false'
     }
   ],
