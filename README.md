@@ -56,8 +56,18 @@ module.exports =  {
 CSS
 
 ```css
+/* @import will combine the css of imported files*/
+@import './a-css-file';
+/* @require are just an alias for @import.
+They are useful when combining this loader with the sass loader because they allow you to bypass
+sass's own @import
+*/
+@require './another-css-file';
+
+/* These variables will be stored and exported as locals */
 @value my-special-color '#ff00ff';
 @value another-special-color from './colors.css';
+
 
 .my-class {
   composes: another from './another-css-file.css';
@@ -68,13 +78,12 @@ CSS
 JS
 
 ```javascript
-import { locals } from './my-css.css';
+import cssModule from './my-css.css';
 
-locals['my-special-color'] === '#ff00ff'; // true
-locals['another-special-color'] === require('./colors.css').locals['another-special-color']; // true
+cssModule['my-special-color'] === '#ff00ff'; // true
+cssModule['another-special-color'] === require('./colors.css')['another-special-color']; // true
 
-locals['my-class'] === \
-  require('./another-css-file.css').locals['another'] + ' my-class--1a1b2'; // true
+cssModule['my-class'] === require('./another-css-file.css')['another'] + ' my-class--1a1b2'; // true
 ```
 
 ### Path resolution
