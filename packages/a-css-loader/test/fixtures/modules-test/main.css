@@ -1,4 +1,5 @@
 @import './imported-styles.css';
+@require './imported-styles-2.css';
 
 :local(.local) {
   background-color: black;

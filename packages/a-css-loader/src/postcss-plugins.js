@@ -19,11 +19,20 @@ exports.urlReplacer = postcss.plugin('url-replacer', ({ createImportedName }) =>
   };
 });
 
+
+function addUrl(rule, symbolsCollector) {
+  symbolsCollector.addUrl(stripQuotes(rule.params));
+  rule.remove();
+}
+
 exports.cssModulesFinalSweeper = postcss.plugin('css-modules-final-sweeper', ({ symbolsCollector }) => {
   return (css) => {
     css.walkAtRules('import', (rule) => {
-      symbolsCollector.addUrl(stripQuotes(rule.params));
-      rule.remove();
+      addUrl(rule, symbolsCollector)
+    });
+
+    css.walkAtRules('require', (rule) => {
+      addUrl(rule, symbolsCollector)
     });
 
     css.walkRules((rule) => {

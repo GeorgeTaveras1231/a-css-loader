@@ -53,6 +53,14 @@ describe('build', () => {
         assert.ok(this.css.indexOf('@import') === -1);
       });
 
+      it('removes @require', function () {
+        assert.ok(this.css.indexOf('@require') === -1);
+      });
+
+      it('includes the css from required and imported modules', function () {
+        assert(this.css.indexOf('.a-2-class') > 0);
+      });
+
       it('includes the css from js module', function () {
         const ruleFromJs = this.parsedCSS.stylesheet.rules.find((rule) => {
           return rule.selectors.find($1 => $1 === '.simple-module');
