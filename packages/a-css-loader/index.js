@@ -6,13 +6,13 @@ const localByDefault = require('postcss-modules-local-by-default');
 const modulesValues = require('a-css-loader_postcss-modules-values');
 
 const loaderUtils = require('loader-utils');
-const genericNames = require('generic-names');
 const cssnano = require('cssnano');
 const extend = require('extend');
 
 const { SymbolsCollector } = require('./src/symbols-collector');
 const { cssModulesFinalSweeper, urlReplacer } = require('./src/postcss-plugins');
 const toJS = require('./src/to-js');
+const createClassNameGenerator = require('./src/create-class-name-generator');
 
 const LOADER_NAME = 'a-css-loader';
 const DEFAULT_OPTIONS = Object.freeze({
@@ -21,23 +21,6 @@ const DEFAULT_OPTIONS = Object.freeze({
   camelize: false,
   minimize: true
 });
-
-function createClassNameGenerator(pattern, loaderContext) {
-  /* Mostly borrowed fron npm: generic-names */
-  return function generate(localName, filepath, css) {
-    var name = pattern.replace(/\[local\]/gi, localName);
-    var loaderOptions = {
-      content: `${localName}+${css}`
-    };
-
-    var genericName = loaderUtils.interpolateName(loaderContext, name, loaderOptions);
-
-    return genericName
-      .replace(new RegExp('[^a-zA-Z0-9\\-_\u00A0-\uFFFF]', 'g'), '-')
-      .replace(/^((-?[0-9])|--)/, "_$1");
-  };
-}
-
 
 function postcssPlugins(symbolsCollector, loaderContext, {
   mode,
