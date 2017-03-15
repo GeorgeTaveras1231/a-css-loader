@@ -24,6 +24,6 @@ describe('extract-text-plugin-integration', () => {
     const result = css.parse(this.assets['result.css'].source());
 
     const selectors = result.stylesheet.rules.map($1 => $1.selectors);
-    assert.deepEqual(selectors, [ [ '.a--09208' ], [ '.a--a1310' ], [ '.b--63583' ] ]);
+    assert.deepEqual(selectors, [ [ '.a--36665' ], [ '.a--7b81b' ], [ '.b--8cf29' ] ]);
   });
 });

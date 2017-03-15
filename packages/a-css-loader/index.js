@@ -22,7 +22,24 @@ const DEFAULT_OPTIONS = Object.freeze({
   minimize: true
 });
 
-function postcssPlugins(symbolsCollector, {
+function createClassNameGenerator(pattern, loaderContext) {
+  /* Mostly borrowed fron npm: generic-names */
+  return function generate(localName, filepath, css) {
+    var name = pattern.replace(/\[local\]/gi, localName);
+    var loaderOptions = {
+      content: `${localName}+${css}`
+    };
+
+    var genericName = loaderUtils.interpolateName(loaderContext, name, loaderOptions);
+
+    return genericName
+      .replace(new RegExp('[^a-zA-Z0-9\\-_\u00A0-\uFFFF]', 'g'), '-')
+      .replace(/^((-?[0-9])|--)/, "_$1");
+  };
+}
+
+
+function postcssPlugins(symbolsCollector, loaderContext, {
   mode,
   scopedNameFormat,
   minimize
@@ -35,7 +52,7 @@ function postcssPlugins(symbolsCollector, {
     extractImports({ createImportedName: localsAgent }),
     urlReplacer({ createImportedName: urlsAgent }),
     modulesValues({ createImportedName: localsAgent }),
-    modulesScope({ generateScopedName: genericNames(scopedNameFormat) }),
+    modulesScope({ generateScopedName: createClassNameGenerator(scopedNameFormat, loaderContext) }) ,
     cssModulesFinalSweeper({ symbolsCollector })
   ];
 
@@ -56,7 +73,7 @@ module.exports = function (source) {
   const callback = this.async();
 
   postcss(
-    postcssPlugins(symbolsCollector, options)
+    postcssPlugins(symbolsCollector, this, options)
   )
   .process(source)
   .then(({ css }) => {

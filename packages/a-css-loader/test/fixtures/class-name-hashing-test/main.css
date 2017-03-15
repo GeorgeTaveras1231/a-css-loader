@@ -1,0 +1,4 @@
+:local .test-class {
+  composes: a-class from './a.css';
+  composes: a-class from './b.css';
+}
