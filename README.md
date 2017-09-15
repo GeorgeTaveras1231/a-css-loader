@@ -106,6 +106,7 @@ Example:
 
 | Name | Type | Description |
 |------|-------------|-------|
-| camelize | boolean | Wether to export camelized versions of the keys |
+| camelize | boolean | Whether to export camelized versions of the keys |
+| reduceIdents | boolean | Whether to minify @ rules names |
 | scopedNameFormat | string | Format for class name. It leverages [this](https://github.com/webpack/loader-utils#interpolatename). |
 | mode | enum | 'pure', 'global', or 'local' |
