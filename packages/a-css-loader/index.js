@@ -25,7 +25,8 @@ const DEFAULT_OPTIONS = Object.freeze({
 function postcssPlugins(symbolsCollector, loaderContext, {
   mode,
   scopedNameFormat,
-  minimize
+  minimize,
+  reduceIdents
 }) {
   const localsAgent = symbolsCollector.createImportedItemCollectorAgent(['locals']);
   const urlsAgent = symbolsCollector.createImportedItemCollectorAgent([/* no namespace for url requires */]);
@@ -40,7 +41,12 @@ function postcssPlugins(symbolsCollector, loaderContext, {
   ];
 
   if (minimize) {
-    const options = typeof minimize === 'object' ? minimize : { reduceIdents: false };
+    const options = typeof minimize === 'object' ? minimize : {};
+
+    if (typeof reduceIdents === 'boolean') {
+      options.reduceIdents = reduceIdents;
+    }
+
     plugins.push(cssnano(options));
   }
 
